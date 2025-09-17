@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English - Paro AI ChatBot 🎯</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-mcq: #3cb043;
+            --color-notes: #007bff;
+            --main-font: 'Poppins', Arial, sans-serif;
+            --background-color: #f0f2f5;
+            --text-color: #333;
+            --card-background: #ffffff;
+            --link-color: #4285f4;
+            --accent-light: #e8f0fe;
+            --chat-background: #f9f9f9;
+            --user-message-color: #d1e7fd;
+            --header-gradient: linear-gradient(135deg, #1a73e8, #4285f4);
+            --shadow-color: rgba(0, 0, 0, 0.2);
+        }
+        body.dark-mode {
+            --background-color: #121212;
+            --text-color: #e0e0e0;
+            --card-background: #1e1e1e;
+            --accent-light: #2c2c2c;
+            --chat-background: #1f1f1f;
+            --user-message-color: #333333;
+            --header-gradient: linear-gradient(135deg, #0d3875, #224b89);
+            --shadow-color: rgba(0, 0, 0, 0.5);
+            --link-color: #a0c4ff;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: var(--main-font);
+            margin: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        header {
+            background: var(--header-gradient);
+            padding: 20px;
+            box-shadow: 0 4px 10px var(--shadow-color);
+            text-align: center;
+            position: relative;
+        }
+        .header-title h1 {
+            margin: 0;
+            font-size: 1.8em;
+            color: #fff;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+        .main-content { padding: 15px; max-width: 1200px; margin: 20px auto; }
+        .search-container { margin-bottom: 20px; display: flex; justify-content: center; }
+        #chapter-search {
+            width: 100%;
+            max-width: 600px;
+            padding: 12px 20px;
+            font-size: 1em;
+            border-radius: 25px;
+            border: 1px solid #ccc;
+            background-color: var(--card-background);
+            color: var(--text-color);
+            outline: none;
+            box-shadow: 0 2px 6px var(--shadow-color);
+        }
+        .subject-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+            padding: 15px;
+            background-color: var(--card-background);
+            border-radius: 15px;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            margin-top: 20px;
+        }
+        .subject-card {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background-color: var(--accent-light);
+            border-radius: 12px;
+            text-align: center;
+        }
+        .subject-card h3 { margin: 10px 0; font-size: 1.1em; color: var(--text-color); }
+        .subject-card .icon { font-size: 2em; }
+        .ai-tutor-section {
+            background-color: var(--card-background);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            min-height: 50vh;
+        }
+        .ai-tutor-section h2 { color: var(--link-color); text-align: center; font-size: 1.8em; margin: 0 0 20px 0; }
+        .chat-container { flex-grow: 1; overflow-y: auto; padding: 10px; border: 1px solid #ddd; border-radius: 10px; margin-bottom: 10px; background-color: var(--chat-background); display: flex; flex-direction: column; }
+        .message { padding: 10px 15px; border-radius: 15px; margin-bottom: 10px; max-width: 80%; word-wrap: break-word; }
+        .ai-tutor-message { background-color: var(--accent-light); align-self: flex-start; }
+        .user-message { background-color: var(--user-message-color); align-self: flex-end; }
+        .chat-input-area { display: flex; gap: 10px; }
+        #user-input { flex-grow: 1; padding: 12px 20px; border: 1px solid #ccc; border-radius: 25px; background-color: var(--card-background); color: var(--text-color); }
+        #send-btn { background-color: var(--link-color); color: #fff; border: none; border-radius: 25px; padding: 12px 20px; cursor: pointer; }
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--link-color); border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; margin: 10px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        #mcq-section { display: none; padding: 20px; background-color: var(--card-background); border-radius: 15px; }
+        #mcq-section h2 { color: var(--color-mcq); text-align: center; font-size: 2em; }
+        .mcq-question { margin-bottom: 20px; padding: 15px; border-radius: 10px; background-color: var(--chat-background); }
+        .mcq-options { list-style: none; padding: 0; }
+        .mcq-options li { background-color: var(--accent-light); padding: 10px; margin-bottom: 5px; border-radius: 5px; cursor: pointer; }
+        .mcq-options li.correct { background-color: #c8e6c9; border: 2px solid var(--color-mcq); }
+        .mcq-options li.incorrect { background-color: #ffcdd2; border: 2px solid #ff0000; }
+        #back-btn { background-color: #555; color: #fff; border: none; padding: 10px 20px; border-radius: 25px; cursor: pointer; margin-top: 20px; }
+        #theme-toggle { position: absolute; top: 20px; right: 20px; background: none; border: none; cursor: pointer; font-size: 1.5em; color: #fff; }
+        .button-group { display: flex; flex-direction: column; gap: 8px; margin-top: 15px; width: 100%; }
+        .btn, .view-ncert-btn {
+            color: #fff;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            display: block;
+        }
+        .generate-mcq-btn { background-color: var(--color-mcq); }
+        .view-notes-btn { background-color: var(--color-notes); }
+        .view-ncert-btn {
+            background-color: #ff9800; /* Orange for NCERT */
+        }
+        .view-ncert-btn:hover {
+            background-color: #e68a00;
+        }
+        .chapter-category { width: 100%; font-size: 1.5em; color: var(--text-color); font-weight: 600; margin: 30px 0 10px 0; grid-column: 1 / -1; }
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 2em;
+            color: #fff;
+            padding: 5px;
+            text-decoration: none;
+            transition: transform 0.3s ease;
+        }
+        .back-button:hover {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <a href="Home.html" class="back-button">←</a>
+            <div class="header-title">
+                <h1>English 📚</h1>
+            </div>
+            <button id="theme-toggle">☀️</button>
+        </div>
+    </header>
+    <main class="main-content">
+        <div class="search-container">
+            <input type="text" id="chapter-search" placeholder="Search for a chapter or poem...">
+        </div>
+        
+        <section id="main-content-section" class="subject-grid">
+            <h2 class="chapter-category">Flamingo (Prose)</h2>
+            <article class="subject-card" data-chapter="The Last Lesson"><span class="icon">🇫🇷</span><h3>The Last Lesson</h3><div class="button-group"><a href="https://ncert.nic.in/textbook/pdf/lefl101.pdf" target="_blank" class="btn view-ncert-btn">NCERT Book</a><a href="https://www.learncbse.in/ncert-solutions-for-class-12-flamingo-english-the-last-lesson/" target="_blank" class="btn view-notes-btn">View Notes</a><button class="btn generate-mcq-btn">Generate MCQ</button></div></article>
+            <article class="subject-card" data-chapter="Lost Spring"><span class="icon">🗑️</span><h3>Lost Spring</h3><div class="button-group"><a href="https://ncert.nic.in/textbook/pdf/lefl102.pdf" target="_blank" class="btn view-ncert-btn">NCERT Book</a><a href="https://www.learncbse.in/ncert-solutions-for-class-12-flamingo-english-lost-spring/" target="_blank" class="btn view-notes-btn">View Notes</a><button class="btn generate-mcq-btn">Generate MCQ</button></div></article>
+            <article class="subject-card" data-chapter="Deep Water"><span class="icon">🏊</span><h3>Deep Water</h3><div class="button-group"><a href="https://ncert.nic.in/textbook/pdf/lefl103.pdf" target="_blank" class="btn view-ncert-btn">NCERT Book</a><a href="https://www.learncbse.in/ncert-solutions-for-class-12-flamingo-english-deep-water/" target="_blank" class="btn view-notes-btn">View Notes</a><button class="btn generate-mcq-btn">Generate MCQ</button></div></article>
+            <article class="subject-card" data-chapter="The Rattrap"><span class="icon">🐭</span><h3>The Rattrap</h3><div class="button-group"><a href="https://ncert.nic.in/textbook/pdf/lefl104.pdf" target="_blank" class="btn view-ncert-btn">NCERT Book</a><a href="https://www.learncbse.in/ncert-solutions-for-class-12-flamingo-english-the-rattrap/" target="_blank" class="btn view-notes-btn">View Notes</a><button class="btn generate-mcq-btn">Generate MCQ</button></div></article>
+            <article class="subject-card" data-chapter="Indigo"><span class="icon">🌿</span><h3>Indigo</h3><div class="button-group"><a href="https://ncert.nic.in/textbook/pdf/lefl105.pdf" target="_blank" class="btn view-ncert-btn">NCERT Book</a><a href="https://www.learncbse.in/ncert-solutions-for-class-12-flamingo-english-indigo/" target="_blank" class="btn view-notes-btn">View Notes</a><button class="btn generate-mcq-btn">Generate MCQ</button></div></article>
+            <article class="subject-card" data-chapter="Poets and Pancakes"><span class="icon">🥞</span><h3>Poets and Pancakes</h3><div class="button-group"><a href="https://ncert.nic.in/textbook/pdf/lefl106.pdf" target="_blank" class="btn view-ncert-btn">NCERT Book</a><a href="https://www.learncbse.in/ncert-solutions-for-class-12-flamingo-english-poets-and-pancakes/" target="_blank" class="btn view-notes-btn">View Notes</a><button class="btn generate-mcq-btn">Generate MCQ</button></div></article>
+            <article class="subject-card" data-chapter="The Interview"><span class="icon">🎙️</span><h3>The Interview</h3><div class="button-group"><a href="https://ncert.nic.in/textbook/pdf/lefl107.pdf" target="_blank" class="btn view-ncert-btn">NCERT Book</a><a href="https://www.learncbse.in/ncert-solutions-for-class-12-flamingo-english-the-interview/" target="_blank" class="btn view-notes-btn">View Notes</a><button class="btn generate-mcq-btn">Generate MCQ</button></div></article>
+            <article class="subject-card" data-chapter="Going Places"><span class="icon">✈️</span><h3>Going Places</h3><div class="button-group"><a href="https://ncert.nic.in/textbook/pdf/lefl108.pdf" target="_blank" class="btn view-ncert-btn">NCERT Book</a><a href="https://www.learncbse.in/ncert-solutions-for-class-12-flamingo-english-going-places/" target="_blank" class="btn view-notes-btn">View Notes</a><button class="btn generate-mcq-btn">Generate MCQ</button></div></article>
+
+            <h2 class="chapter-category">Flamingo (Poetry)</h2>
+            <article class="subject-card" data-chapter="My Mother at Sixty-Six"><span class="icon">🚗</span><h3>My Mother at Sixty-Six</h3><div class="button-group"><a href="https://ncert.nic.in/textbook/pdf/lefl109.pdf" target="_blank" class="btn view-ncert-btn">NCERT Book</a><a href="https://www.learncbse.in/ncert-solutions-for-class-12-flamingo-english-my-mother-at-sixty-six/" target="_blank" class="btn view-notes-btn">View Notes</a><button class="btn generate-mcq-btn">Generate MCQ</button></div></article>
+            <article class="subject-card" data-chapter="An Elementary School Classroom in a Slum"><span class="icon">🏫</span><h3>An Elementary School...</h3><div class="button-group"><a href="https://ncert.nic.in/textbook/pdf/lefl110.pdf" target="_blank" class="btn view-ncert-btn">NCERT Book</a><a href="https://www.learncbse.in/ncert-solutions-for-class-12-flamingo-english-an-elementary-school-classroom-in-a-slum/" target="_blank" class="btn view-notes-btn">View Notes</a><button class="btn generate-mcq-btn">Generate MCQ</button></div></article>
+            <article class="subject-card" data-chapter="Keeping Quiet"><span class="icon">🤫</span><h3>Keeping Quiet</h3><div class="button-group"><a href="https://ncert.nic.in/textbook/pdf/lefl111.pdf" target="_blank" class="btn view-ncert-btn">NCERT Book</a><a href="https://www.learncbse.in/ncert-solutions-for-class-12-flamingo-english-keeping-quiet/" target="_blank" class="btn view-notes-btn">View Notes</a><button class="btn generate-mcq-btn">Generate MCQ</button></div></article>
+            <article class="subject-card" data-chapter="A Thing of Beauty"><span class="icon">💖</span><h3>A Thing of Beauty</h3><div class="button-group"><a href="https://ncert.nic.in/textbook/pdf/lefl112.pdf" target="_blank" class="btn view-ncert-btn">NCERT Book</a><a href="https://www.learncbse.in/ncert-solutions-for-class-12-flamingo-english-a-thing-of-beauty/" target="_blank" class="btn view-notes-btn">View Notes</a><button class="btn generate-mcq-btn">Generate MCQ</button></div></article>
+            <article class="subject-card" data-chapter="A Roadside Stand"><span class="icon">🏪</span><h3>A Roadside Stand</h3><div class="button-group"><a href="https://ncert.nic.in/textbook/pdf/lefl113.pdf" target="_blank" class="btn view-ncert-btn">NCERT Book</a><a href="https://www.learncbse.in/ncert-solutions-for-class-12-flamingo-english-a-roadside-stand/" target="_blank" class="btn view-notes-btn">View Notes</a><button class="btn generate-mcq-btn">Generate MCQ</button></div></article>
+            <article class="subject-card" data-chapter="Aunt Jennifer's Tigers"><span class="icon">🐯</span><h3>Aunt Jennifer's Tigers</h3><div class="button-group"><a href="https://ncert.nic.in/textbook/pdf/lefl114.pdf" target="_blank" class="btn view-ncert-btn">NCERT Book</a><a href="https://www.learncbse.in/ncert-solutions-for-class-12-flamingo-english-aunt-jennifers-tigers/" target="_blank" class="btn view-notes-btn">View Notes</a><button class="btn generate-mcq-btn">Generate MCQ</button></div></article>
+
+            <h2 class="chapter-category">Vistas (Prose)</h2>
+            <article class="subject-card" data-chapter="The Third Level"><span class="icon">🚆</span><h3>The Third Level</h3><div class="button-group"><a href="https://ncert.nic.in/textbook/pdf/levs101.pdf" target="_blank" class="btn view-ncert-btn">NCERT Book</a><a href="https://www.learncbse.in/ncert-solutions-for-class-12-vistas-english-third-level/" target="_blank" class="btn view-notes-btn">View Notes</a><button class="btn generate-mcq-btn">Generate MCQ</button></div></article>
+            <article class="subject-card" data-chapter="The Tiger King"><span class="icon">👑</span><h3>The Tiger King</h3><div class="button-group"><a href="https://ncert.nic.in/textbook/pdf/levs102.pdf" target="_blank" class="btn view-ncert-btn">NCERT Book</a><a href="https://www.learncbse.in/ncert-solutions-for-class-12-vistas-english-the-tiger-king/" target="_blank" class="btn view-notes-btn">View Notes</a><button class="btn generate-mcq-btn">Generate MCQ</button></div></article>
+            <article class="subject-card" data-chapter="Journey to the End of the Earth"><span class="icon">🌍</span><h3>Journey to the End of the Earth</h3><div class="button-group"><a href="https://ncert.nic.in/textbook/pdf/levs103.pdf" target="_blank" class="btn view-ncert-btn">NCERT Book</a><a href="https://www.learncbse.in/ncert-solutions-for-class-12-vistas-english-journey-to-the-end-of-the-earth/" target="_blank" class="btn view-notes-btn">View Notes</a><button class="btn generate-mcq-btn">Generate MCQ</button></div></article>
+            <article class="subject-card" data-chapter="The Enemy"><span class="icon">敵</span><h3>The Enemy</h3><div class="button-group"><a href="https://ncert.nic.in/textbook/pdf/levs104.pdf" target="_blank" class="btn view-ncert-btn">NCERT Book</a><a href="https://www.learncbse.in/ncert-solutions-for-class-12-vistas-english-the-enemy/" target="_blank" class="btn view-notes-btn">View Notes</a><button class="btn generate-mcq-btn">Generate MCQ</button></div></article>
+            <article class="subject-card" data-chapter="Should Wizard Hit Mommy"><span class="icon">🧙</span><h3>Should Wizard Hit Mommy</h3><div class="button-group"><a href="https://ncert.nic.in/textbook/pdf/levs105.pdf" target="_blank" class="btn view-ncert-btn">NCERT Book</a><a href="https://www.learncbse.in/ncert-solutions-for-class-12-vistas-english-should-wizard-hit-mommy/" target="_blank" class="btn view-notes-btn">View Notes</a><button class="btn generate-mcq-btn">Generate MCQ</button></div></article>
+            <article class="subject-card" data-chapter="On the Face of It"><span class="icon">🙂</span><h3>On the Face of It</h3><div class="button-group"><a href="https://ncert.nic.in/textbook/pdf/levs106.pdf" target="_blank" class="btn view-ncert-btn">NCERT Book</a><a href="https://www.learncbse.in/ncert-solutions-for-class-12-vistas-english-on-the-face-of-it/" target="_blank" class="btn view-notes-btn">View Notes</a><button class="btn generate-mcq-btn">Generate MCQ</button></div></article>
+            <article class="subject-card" data-chapter="Evans Tries an O-level"><span class="icon">📝</span><h3>Evans Tries an O-level</h3><div class="button-group"><a href="https://ncert.nic.in/textbook/pdf/levs107.pdf" target="_blank" class="btn view-ncert-btn">NCERT Book</a><a href="https://www.learncbse.in/ncert-solutions-for-class-12-vistas-english-evans-tries-an-o-level/" target="_blank" class="btn view-notes-btn">View Notes</a><button class="btn generate-mcq-btn">Generate MCQ</button></div></article>
+            <article class="subject-card" data-chapter="Memories of Childhood"><span class="icon">👧</span><h3>Memories of Childhood</h3><div class="button-group"><a href="https://ncert.nic.in/textbook/pdf/levs108.pdf" target="_blank" class="btn view-ncert-btn">NCERT Book</a><a href="https://www.learncbse.in/ncert-solutions-for-class-12-vistas-english-memories-of-childhood/" target="_blank" class="btn view-notes-btn">View Notes</a><button class="btn generate-mcq-btn">Generate MCQ</button></div></article>
+        </section>
+
+        <section id="mcq-section">
+            <button id="back-btn">← Back to Topics</button>
+            <h2 id="mcq-topic-title"></h2>
+            <div id="mcq-container"></div>
+            <div id="mcq-loader" class="loader" style="display:none;"></div>
+        </section>
+
+        <section class="ai-tutor-section">
+            <h2>Paro AI Tutor ✨</h2>
+            <div id="chat-container" class="chat-container">
+                <div class="message ai-tutor-message">Hello! I'm Paro AI. What English topic can I help you with?</div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" id="user-input" placeholder="Ask about a chapter, poem, or character...">
+                <button id="send-btn">Send</button>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const mainContentSection = document.getElementById('main-content-section');
+            const mcqSection = document.getElementById('mcq-section');
+            const mcqContainer = document.getElementById('mcq-container');
+            const mcqLoader = document.getElementById('mcq-loader');
+            const backBtn = document.getElementById('back-btn');
+            const mcqTopicTitle = document.getElementById('mcq-topic-title');
+            const chapterSearch = document.getElementById('chapter-search');
+            
+            // --- Theme Toggle ---
+            const themeToggleBtn = document.getElementById('theme-toggle');
+            const body = document.body;
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                body.classList.add('dark-mode');
+                themeToggleBtn.textContent = '🌙';
+            }
+            themeToggleBtn.addEventListener('click', () => {
+                body.classList.toggle('dark-mode');
+                const isDarkMode = body.classList.contains('dark-mode');
+                themeToggleBtn.textContent = isDarkMode ? '🌙' : '☀️';
+                localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+            });
+            
+            backBtn.addEventListener('click', () => {
+                mainContentSection.style.display = 'grid';
+                mcqSection.style.display = 'none';
+            });
+
+            // --- Search Logic ---
+            chapterSearch.addEventListener('keyup', () => {
+                const query = chapterSearch.value.toLowerCase();
+                document.querySelectorAll('.subject-card').forEach(card => {
+                    card.style.display = card.dataset.chapter.toLowerCase().includes(query) ? 'flex' : 'none';
+                });
+            });
+
+            document.querySelectorAll('.generate-mcq-btn').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const chapterName = event.target.closest('.subject-card').dataset.chapter;
+                    generateAndDisplayMCQs(chapterName);
+                });
+            });
+
+            // --- AI Tutor script ---
+            const apiKey = 'AIzaSyCPx64eOZUtsiZ-DkRYwXGssF1qsOdj4FA';
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+            const chatContainer = document.getElementById('chat-container');
+            const userInput = document.getElementById('user-input');
+            const sendBtn = document.getElementById('send-btn');
+
+            function displayMessage(content, sender) {
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('message');
+                messageDiv.classList.add(sender === 'user' ? 'user-message' : 'ai-tutor-message');
+                
+                messageDiv.innerHTML = content;
+                
+                chatContainer.appendChild(messageDiv);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+
+            function showLoading(container) {
+                const loadingDiv = document.createElement('div');
+                loadingDiv.classList.add('loader');
+                loadingDiv.id = 'loader';
+                container.appendChild(loadingDiv);
+                container.scrollTop = container.scrollHeight;
+            }
+
+            function hideLoading() {
+                const loader = document.getElementById('loader');
+                if (loader) {
+                    loader.remove();
+                }
+            }
+
+            async function generateContent(prompt, config = {}) {
+                try {
+                    const payload = {
+                        "contents": [{
+                            "role": "user",
+                            "parts": [{ "text": prompt }]
+                        }],
+                        ...config
+                    };
+                    
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`API response error: ${response.status} ${response.statusText}`);
+                    }
+
+                    const result = await response.json();
+                    return result;
+                } catch (error) {
+                    console.error('Error fetching from Gemini API:', error);
+                    return { error: 'Sorry, an error occurred. Please try again.' };
+                }
+            }
+
+            async function handleUserInput() {
+                const userMessage = userInput.value.trim();
+                if (userMessage === '') return;
+                
+                displayMessage(userMessage, 'user');
+                userInput.value = '';
+                showLoading(chatContainer);
+
+                const generalPrompt = `The user asked: "${userMessage}". Act as a knowledgeable tutor for English and provide a concise, helpful answer that teaches the concept. Explain it in a way a student can understand, perhaps with an example if applicable. Keep the response under min 10 words or max 99 words.`;
+                const geminiResponse = await generateContent(generalPrompt);
+                
+                hideLoading();
+
+                const text = geminiResponse?.candidates?.[0]?.content?.parts?.[0]?.text || 'Sorry, I could not generate a response. Please try again.';
+                // Replace markdown bold with HTML bold
+                const formattedText = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+                
+                displayMessage(formattedText, 'ai');
+            }
+
+            sendBtn.addEventListener('click', handleUserInput);
+            userInput.addEventListener('keydown', function(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    handleUserInput();
+                }
+            });
+
+            // --- MCQ Generation Logic ---
+            async function generateAndDisplayMCQs(topic) {
+                mainContentSection.style.display = 'none';
+                mcqSection.style.display = 'block';
+                mcqTopicTitle.textContent = `MCQs on: ${topic}`;
+                mcqContainer.innerHTML = '';
+                mcqLoader.style.display = 'block';
+
+                const mcqPrompt = `Generate 19 multiple-choice questions about the English topic "${topic}". The response must be a valid JSON array of objects. Each object should have three properties: "question" (string), "options" (an array of 4 strings), and "answer" (string). The "answer" must match one of the options exactly.`;
+                
+                const responseSchema = {
+                    type: "ARRAY",
+                    items: {
+                        type: "OBJECT",
+                        properties: {
+                            "question": { "type": "STRING" },
+                            "options": {
+                                "type": "ARRAY",
+                                "items": { "type": "STRING" },
+                                "minItems": 4,
+                                "maxItems": 4
+                            },
+                            "answer": { "type": "STRING" }
+                        },
+                        "required": ["question", "options", "answer"]
+                    }
+                };
+
+                const generationConfig = {
+                    generationConfig: {
+                        responseMimeType: "application/json",
+                        responseSchema: responseSchema
+                    }
+                };
+
+                const result = await generateContent(mcqPrompt, generationConfig);
+
+                mcqLoader.style.display = 'none';
+
+                if (result.error) {
+                    mcqContainer.innerHTML = `<p style="color:red; text-align:center;">${result.error}</p>`;
+                    return;
+                }
+
+                try {
+                    const jsonString = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (!jsonString) {
+                         mcqContainer.innerHTML = `<p style="color:red; text-align:center;">Could not generate questions. Please try a different topic.</p>`;
+                         return;
+                    }
+                    const mcqs = JSON.parse(jsonString);
+                    mcqs.forEach((mcq, index) => {
+                        const questionDiv = document.createElement('div');
+                        questionDiv.classList.add('mcq-question');
+                        questionDiv.innerHTML = `<p>${index + 1}. ${mcq.question}</p>`;
+                        const optionsList = document.createElement('ul');
+                        optionsList.classList.add('mcq-options');
+                        
+                        mcq.options.forEach(option => {
+                            const optionItem = document.createElement('li');
+                            optionItem.textContent = option;
+                            optionItem.addEventListener('click', () => {
+                                checkAnswer(optionItem, option, mcq.answer, optionsList);
+                            });
+                            optionsList.appendChild(optionItem);
+                        });
+
+                        questionDiv.appendChild(optionsList);
+                        mcqContainer.appendChild(questionDiv);
+                    });
+                } catch (parseError) {
+                    console.error('Failed to parse JSON:', parseError);
+                    mcqContainer.innerHTML = `<p style="color:red; text-align:center;">Failed to generate MCQs. The AI provided an invalid format. Please try again.</p>`;
+                }
+            }
+
+            function checkAnswer(selectedOption, selectedText, correctAnswer, optionsList) {
+                optionsList.querySelectorAll('li').forEach(li => {
+                    li.style.pointerEvents = 'none'; // Disable further clicks
+                    if (li.textContent === correctAnswer) {
+                        li.classList.add('correct');
+                    }
+                });
+
+                if (selectedText === correctAnswer) {
+                    selectedOption.classList.add('correct');
+                } else {
+                    selectedOption.classList.add('incorrect');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

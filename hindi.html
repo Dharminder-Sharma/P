@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hindi - Paro AI ChatBot 🎯</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-mcq: #ff9800;
+            --color-notes: #007bff;
+            --main-font: 'Poppins', Arial, sans-serif;
+            --background-color: #f0f2f5;
+            --text-color: #333;
+            --card-background: #ffffff;
+            --link-color: #f44336;
+            --accent-light: #fde8e6;
+            --chat-background: #f9f9f9;
+            --user-message-color: #d1e7fd;
+            --header-gradient: linear-gradient(135deg, #ef5350, #f44336);
+            --shadow-color: rgba(0, 0, 0, 0.2);
+        }
+        body.dark-mode {
+            --background-color: #121212;
+            --text-color: #e0e0e0;
+            --card-background: #1e1e1e;
+            --accent-light: #2c2c2c;
+            --chat-background: #1f1f1f;
+            --user-message-color: #333333;
+            --header-gradient: linear-gradient(135deg, #b71c1c, #d32f2f);
+            --shadow-color: rgba(0, 0, 0, 0.5);
+            --link-color: #ff8a80;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: var(--main-font);
+            margin: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+        header {
+            background: var(--header-gradient);
+            padding: 20px;
+            box-shadow: 0 4px 10px var(--shadow-color);
+            text-align: center;
+            position: relative;
+        }
+        h1 { margin: 0; font-size: 1.8em; color: #fff; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2); }
+        .main-content { padding: 15px; max-width: 1200px; margin: 20px auto; }
+        .search-container { margin-bottom: 20px; display: flex; justify-content: center; }
+        #chapter-search {
+            width: 100%;
+            max-width: 600px;
+            padding: 12px 20px;
+            font-size: 1em;
+            border-radius: 25px;
+            border: 1px solid #ccc;
+            background-color: var(--card-background);
+            color: var(--text-color);
+        }
+        .subject-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+            padding: 15px;
+            background-color: var(--card-background);
+            border-radius: 15px;
+        }
+        .subject-card {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background-color: var(--accent-light);
+            border-radius: 12px;
+            text-align: center;
+        }
+        .subject-card h3 { margin: 10px 0; font-size: 1.1em; color: var(--text-color); }
+        .subject-card .icon { font-size: 2em; }
+        .ai-tutor-section {
+            background-color: var(--card-background);
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+        }
+        .ai-tutor-section h2 { color: var(--link-color); text-align: center; font-size: 1.8em; margin: 0 0 20px 0; }
+        .chat-container { flex-grow: 1; overflow-y: auto; padding: 10px; border: 1px solid #ddd; border-radius: 10px; margin-bottom: 10px; background-color: var(--chat-background); display: flex; flex-direction: column; min-height: 40vh;}
+        .message { padding: 10px 15px; border-radius: 15px; margin-bottom: 10px; max-width: 80%; word-wrap: break-word; }
+        .ai-tutor-message { background-color: var(--accent-light); align-self: flex-start; }
+        .user-message { background-color: var(--user-message-color); align-self: flex-end; }
+        .chat-input-area { display: flex; gap: 10px; }
+        #user-input { flex-grow: 1; padding: 12px 20px; border: 1px solid #ccc; border-radius: 25px; background-color: var(--card-background); color: var(--text-color); }
+        #send-btn { background-color: var(--link-color); color: #fff; border: none; border-radius: 25px; padding: 12px 20px; cursor: pointer; }
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--link-color); border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; margin: 10px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        #mcq-section { display: none; padding: 20px; background-color: var(--card-background); border-radius: 15px; }
+        #mcq-section h2 { color: var(--color-mcq); text-align: center; }
+        .mcq-question { margin-bottom: 20px; padding: 15px; border-radius: 10px; background-color: var(--chat-background); }
+        .mcq-options { list-style: none; padding: 0; }
+        .mcq-options li { background-color: var(--accent-light); padding: 10px; margin-bottom: 5px; border-radius: 5px; cursor: pointer; }
+        .mcq-options li.correct { background-color: #c8e6c9; }
+        .mcq-options li.incorrect { background-color: #ffcdd2; }
+        #back-btn { background-color: #555; color: #fff; border: none; padding: 10px 20px; border-radius: 25px; cursor: pointer; margin-top: 20px; }
+        #theme-toggle { position: absolute; top: 20px; right: 20px; background: none; border: none; cursor: pointer; font-size: 1.5em; color: #fff; }
+        .button-group { display: flex; flex-direction: column; gap: 8px; margin-top: 15px; width: 100%; }
+        .generate-mcq-btn, .view-notes-btn, .view-ncert-btn {
+            color: #fff;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            display: block;
+        }
+        .generate-mcq-btn { background-color: var(--color-mcq); }
+        .view-notes-btn { background-color: var(--color-notes); }
+        .view-ncert-btn { background-color: #ff9800; }
+
+        .generate-mcq-btn:hover { background-color: #f57c00; }
+        .view-notes-btn:hover { background-color: #0069d9; }
+        .view-ncert-btn:hover { background-color: #e68a00; }
+        .chapter-category { width: 100%; font-size: 1.5em; color: var(--text-color); font-weight: 600; margin: 30px 0 10px 0; grid-column: 1 / -1; }
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 2em;
+            color: #fff;
+            padding: 5px;
+            text-decoration: none;
+            transition: transform 0.3s ease;
+        }
+        .back-button:hover {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <a href="Home.html" class="back-button">←</a>
+            <div class="header-title">
+                <h1>Hindi 🇮🇳</h1>
+            </div>
+            <button id="theme-toggle">☀️</button>
+        </div>
+    </header>
+    <main class="main-content">
+        <div class="search-container">
+            <input type="text" id="chapter-search" placeholder="Search for a chapter...">
+        </div>
+        
+        <section id="main-content-section" class="subject-grid">
+            <h2 class="chapter-category">Aroh 2 (काव्य भाग)</h2>
+            <article class="subject-card" data-chapter="आत्म-परिचय, एक गीत"><span class="icon">🎤</span><h3>आत्म-परिचय, एक गीत</h3><div class="button-group"><a href="https://ncert.nic.in/textbook/pdf/lhks101.pdf" target="_blank" class="btn view-ncert-btn">NCERT Book</a><a href="https://www.learncbse.in/ncert-solutions-class-12-hindi-core/" target="_blank" class="btn view-notes-btn">View Notes</a><button class="btn generate-mcq-btn">Generate MCQ</button></div></article>
+            <article class="subject-card" data-chapter="पतंग"><span class="icon">🪁</span><h3>पतंग</h3><div class="button-group"><a href="https://ncert.nic.in/textbook/pdf/lhks102.pdf" target="_blank" class="btn view-ncert-btn">NCERT Book</a><a href="https://www.learncbse.in/ncert-solutions-class-12-hindi-core/" target="_blank" class="btn view-notes-btn">View Notes</a><button class="btn generate-mcq-btn">Generate MCQ</button></div></article>
+            <article class="subject-card" data-chapter="कविता के बहाने, बात सीधी थी पर"><span class="icon">✒️</span><h3>कविता के बहाने...</h3><div class="button-group"><a href="https://ncert.nic.in/textbook/pdf/lhks103.pdf" target="_blank" class="btn view-ncert-btn">NCERT Book</a><a href="https://www.learncbse.in/ncert-solutions-class-12-hindi-core/" target="_blank" class="btn view-notes-btn">View Notes</a><button class="btn generate-mcq-btn">Generate MCQ</button></div></article>
+            <article class="subject-card" data-chapter="कैमरे में बंद अपाहिज"><span class="icon">♿</span><h3>कैमरे में बंद अपाहिज</h3><div class="button-group"><a href="https://ncert.nic.in/textbook/pdf/lhks104.pdf" target="_blank" class="btn view-ncert-btn">NCERT Book</a><a href="https://www.learncbse.in/ncert-solutions-class-12-hindi-core/" target="_blank" class="btn view-notes-btn">View Notes</a><button class="btn generate-mcq-btn">Generate MCQ</button></div></article>
+            <article class="subject-card" data-chapter="सहर्ष स्वीकारा है"><span class="icon">😊</span><h3>सहर्ष स्वीकारा है</h3><div class="button-group"><a href="https://ncert.nic.in/textbook/pdf/lhks105.pdf" target="_blank" class="btn view-ncert-btn">NCERT Book</a><a href="https://www.learncbse.in/ncert-solutions-class-12-hindi-core/" target="_blank" class="btn view-notes-btn">View Notes</a><button class="btn generate-mcq-btn">Generate MCQ</button></div></article>
+            <article class="subject-card" data-chapter="उषा"><span class="icon">🌅</span><h3>उषा</h3><div class="button-group"><a href="https://ncert.nic.in/textbook/pdf/lhks106.pdf" target="_blank" class="btn view-ncert-btn">NCERT Book</a><a href="https://www.learncbse.in/ncert-solutions-class-12-hindi-core/" target="_blank" class="btn view-notes-btn">View Notes</a><button class="btn generate-mcq-btn">Generate MCQ</button></div></article>
+            <article class="subject-card" data-chapter="बादल राग"><span class="icon">☁️</span><h3>बादल राग</h3><div class="button-group"><a href="https://ncert.nic.in/textbook/pdf/lhks107.pdf" target="_blank" class="btn view-ncert-btn">NCERT Book</a><a href="https://www.learncbse.in/ncert-solutions-class-12-hindi-core/" target="_blank" class="btn view-notes-btn">View Notes</a><button class="btn generate-mcq-btn">Generate MCQ</button></div></article>
+            <article class="subject-card" data-chapter="कवितावली"><span class="icon">📜</span><h3>कवितावली</h3><div class="button-group"><a href="https://ncert.nic.in/textbook/pdf/lhks108.pdf" target="_blank" class="btn view-ncert-btn">NCERT Book</a><a href="https://www.learncbse.in/ncert-solutions-class-12-hindi-core/" target="_blank" class="btn view-notes-btn">View Notes</a><button class="btn generate-mcq-btn">Generate MCQ</button></div></article>
+            <article class="subject-card" data-chapter="रुबाइयाँ, गज़ल"><span class="icon">🎶</span><h3>रुबाइयाँ, गज़ल</h3><div class="button-group"><a href="https://ncert.nic.in/textbook/pdf/lhks109.pdf" target="_blank" class="btn view-ncert-btn">NCERT Book</a><a href="https://www.learncbse.in/ncert-solutions-class-12-hindi-core/" target="_blank" class="btn view-notes-btn">View Notes</a><button class="btn generate-mcq-btn">Generate MCQ</button></div></article>
+            <article class="subject-card" data-chapter="छोटा मेरा खेत, बगुलों के पंख"><span class="icon">🌾</span><h3>छोटा मेरा खेत...</h3><div class="button-group"><a href="https://ncert.nic.in/textbook/pdf/lhks110.pdf" target="_blank" class="btn view-ncert-btn">NCERT Book</a><a href="https://www.learncbse.in/ncert-solutions-class-12-hindi-core/" target="_blank" class="btn view-notes-btn">View Notes</a><button class="btn generate-mcq-btn">Generate MCQ</button></div></article>
+
+            <h2 class="chapter-category">Aroh 2 (गद्य भाग)</h2>
+            <article class="subject-card" data-chapter="भक्तिन"><span class="icon">🙏</span><h3>भक्तिन</h3><div class="button-group"><a href="https://ncert.nic.in/textbook/pdf/lhks111.pdf" target="_blank" class="btn view-ncert-btn">NCERT Book</a><a href="https://www.learncbse.in/ncert-solutions-class-12-hindi-core/" target="_blank" class="btn view-notes-btn">View Notes</a><button class="btn generate-mcq-btn">Generate MCQ</button></div></article>
+            <article class="subject-card" data-chapter="बाजार दर्शन"><span class="icon">🛍️</span><h3>बाजार दर्शन</h3><div class="button-group"><a href="https://ncert.nic.in/textbook/pdf/lhks112.pdf" target="_blank" class="btn view-ncert-btn">NCERT Book</a><a href="https://www.learncbse.in/ncert-solutions-class-12-hindi-core/" target="_blank" class="btn view-notes-btn">View Notes</a><button class="btn generate-mcq-btn">Generate MCQ</button></div></article>
+            <article class="subject-card" data-chapter="काले मेघा पानी दे"><span class="icon">🌧️</span><h3>काले मेघा पानी दे</h3><div class="button-group"><a href="https://ncert.nic.in/textbook/pdf/lhks113.pdf" target="_blank" class="btn view-ncert-btn">NCERT Book</a><a href="https://www.learncbse.in/ncert-solutions-class-12-hindi-core/" target="_blank" class="btn view-notes-btn">View Notes</a><button class="btn generate-mcq-btn">Generate MCQ</button></div></article>
+            <article class="subject-card" data-chapter="पहलवान की ढोलक"><span class="icon">🥁</span><h3>पहलवान की ढोलक</h3><div class="button-group"><a href="https://ncert.nic.in/textbook/pdf/lhks114.pdf" target="_blank" class="btn view-ncert-btn">NCERT Book</a><a href="https://www.learncbse.in/ncert-solutions-class-12-hindi-core/" target="_blank" class="btn view-notes-btn">View Notes</a><button class="btn generate-mcq-btn">Generate MCQ</button></div></article>
+            <article class="subject-card" data-chapter="चार्ली चैप्लिन यानी हम सब"><span class="icon">🎬</span><h3>चार्ली चैप्लिन...</h3><div class="button-group"><a href="https://ncert.nic.in/textbook/pdf/lhks115.pdf" target="_blank" class="btn view-ncert-btn">NCERT Book</a><a href="https://www.learncbse.in/ncert-solutions-class-12-hindi-core/" target="_blank" class="btn view-notes-btn">View Notes</a><button class="btn generate-mcq-btn">Generate MCQ</button></div></article>
+            <article class="subject-card" data-chapter="नमक"><span class="icon">🧂</span><h3>नमक</h3><div class="button-group"><a href="https://ncert.nic.in/textbook/pdf/lhks116.pdf" target="_blank" class="btn view-ncert-btn">NCERT Book</a><a href="https://www.learncbse.in/ncert-solutions-class-12-hindi-core/" target="_blank" class="btn view-notes-btn">View Notes</a><button class="btn generate-mcq-btn">Generate MCQ</button></div></article>
+            <article class="subject-card" data-chapter="शिरीष के फूल"><span class="icon">🌸</span><h3>शिरीष के फूल</h3><div class="button-group"><a href="https://ncert.nic.in/textbook/pdf/lhks117.pdf" target="_blank" class="btn view-ncert-btn">NCERT Book</a><a href="https://www.learncbse.in/ncert-solutions-class-12-hindi-core/" target="_blank" class="btn view-notes-btn">View Notes</a><button class="btn generate-mcq-btn">Generate MCQ</button></div></article>
+            <article class="subject-card" data-chapter="श्रम-विभाजन और जाति-प्रथा"><span class="icon">✊</span><h3>श्रम-विभाजन...</h3><div class="button-group"><a href="https://ncert.nic.in/textbook/pdf/lhks118.pdf" target="_blank" class="btn view-ncert-btn">NCERT Book</a><a href="https://www.learncbse.in/ncert-solutions-class-12-hindi-core/" target="_blank" class="btn view-notes-btn">View Notes</a><button class="btn generate-mcq-btn">Generate MCQ</button></div></article>
+
+            <h2 class="chapter-category">Vitan 2 (पूरक पाठ्यपुस्तक)</h2>
+            <!-- Vitan Chapters Here - The provided text does not list them, so this is a placeholder -->
+             <article class="subject-card" data-chapter="सिल्वर वैडिंग"><span class="icon">🎉</span><h3>सिल्वर वैडिंग</h3><div class="button-group"><a href="https://ncert.nic.in/textbook/pdf/lhvt101.pdf" target="_blank" class="btn view-ncert-btn">NCERT Book</a><a href="https://www.learncbse.in/ncert-solutions-class-12-hindi-core/" target="_blank" class="btn view-notes-btn">View Notes</a><button class="btn generate-mcq-btn">Generate MCQ</button></div></article>
+             <article class="subject-card" data-chapter="जूझ"><span class="icon">💪</span><h3>जूझ</h3><div class="button-group"><a href="https://ncert.nic.in/textbook/pdf/lhvt102.pdf" target="_blank" class="btn view-ncert-btn">NCERT Book</a><a href="https://www.learncbse.in/ncert-solutions-class-12-hindi-core/" target="_blank" class="btn view-notes-btn">View Notes</a><button class="btn generate-mcq-btn">Generate MCQ</button></div></article>
+             <article class="subject-card" data-chapter="अतीत में दबे पाँव"><span class="icon">👣</span><h3>अतीत में दबे पाँव</h3><div class="button-group"><a href="https://ncert.nic.in/textbook/pdf/lhvt103.pdf" target="_blank" class="btn view-ncert-btn">NCERT Book</a><a href="https://www.learncbse.in/ncert-solutions-class-12-hindi-core/" target="_blank" class="btn view-notes-btn">View Notes</a><button class="btn generate-mcq-btn">Generate MCQ</button></div></article>
+             <article class="subject-card" data-chapter="डायरी के पन्ने"><span class="icon">📔</span><h3>डायरी के पन्ने</h3><div class="button-group"><a href="https://ncert.nic.in/textbook/pdf/lhvt104.pdf" target="_blank" class="btn view-ncert-btn">NCERT Book</a><a href="https://www.learncbse.in/ncert-solutions-class-12-hindi-core/" target="_blank" class="btn view-notes-btn">View Notes</a><button class="btn generate-mcq-btn">Generate MCQ</button></div></article>
+        </section>
+
+        <section id="mcq-section">
+            <button id="back-btn">← Back to Topics</button>
+            <h2 id="mcq-topic-title"></h2>
+            <div id="mcq-container"></div>
+            <div id="mcq-loader" class="loader" style="display:none;"></div>
+        </section>
+
+        <section class="ai-tutor-section">
+            <h2>Paro AI Tutor ✨</h2>
+            <div id="chat-container" class="chat-container">
+                <div class="message ai-tutor-message">नमस्ते! मैं पारो एआई हूँ। आप आज किस हिंदी विषय के बारे में जानना चाहते हैं?</div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" id="user-input" placeholder="अपना प्रश्न यहाँ लिखें...">
+                <button id="send-btn">Send</button>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const mainSection = document.getElementById('main-content-section');
+            const mcqSection = document.getElementById('mcq-section');
+            const mcqContainer = document.getElementById('mcq-container');
+            const mcqLoader = document.getElementById('mcq-loader');
+            const backBtn = document.getElementById('back-btn');
+            const mcqTopicTitle = document.getElementById('mcq-topic-title');
+            const searchInput = document.getElementById('chapter-search');
+            
+            // --- Theme Toggle ---
+            const themeBtn = document.getElementById('theme-toggle');
+            const body = document.body;
+            if (localStorage.getItem('theme') === 'dark') {
+                body.classList.add('dark-mode');
+                themeBtn.textContent = '🌙';
+            }
+            themeBtn.addEventListener('click', () => {
+                body.classList.toggle('dark-mode');
+                const isDark = body.classList.contains('dark-mode');
+                themeBtn.textContent = isDark ? '🌙' : '☀️';
+                localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            });
+            
+            backBtn.addEventListener('click', () => {
+                mainSection.style.display = 'grid';
+                mcqSection.style.display = 'none';
+            });
+
+            // --- Search ---
+            searchInput.addEventListener('keyup', () => {
+                const query = searchInput.value.toLowerCase();
+                document.querySelectorAll('.subject-card').forEach(card => {
+                    const title = card.dataset.chapter.toLowerCase();
+                    card.style.display = title.includes(query) ? 'flex' : 'none';
+                });
+            });
+
+            document.querySelectorAll('.generate-mcq-btn').forEach(btn => {
+                btn.addEventListener('click', e => {
+                    const topic = e.target.closest('.subject-card').dataset.chapter;
+                    generateAndDisplayMCQs(topic);
+                });
+            });
+
+            // --- AI Tutor script ---
+            const apiKey = 'AIzaSyCPx64eOZUtsiZ-DkRYwXGssF1qsOdj4FA';
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+            const chatContainer = document.getElementById('chat-container');
+            const userInput = document.getElementById('user-input');
+            const sendBtn = document.getElementById('send-btn');
+
+            function displayMessage(content, sender) {
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('message');
+                messageDiv.classList.add(sender === 'user' ? 'user-message' : 'ai-tutor-message');
+                
+                messageDiv.innerHTML = content;
+                
+                chatContainer.appendChild(messageDiv);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+
+            function showLoading(container) {
+                const loadingDiv = document.createElement('div');
+                loadingDiv.classList.add('loader');
+                loadingDiv.id = 'loader';
+                container.appendChild(loadingDiv);
+                container.scrollTop = container.scrollHeight;
+            }
+
+            function hideLoading() {
+                const loader = document.getElementById('loader');
+                if (loader) {
+                    loader.remove();
+                }
+            }
+
+            async function generateContent(prompt, config = {}) {
+                try {
+                    const payload = {
+                        "contents": [{
+                            "role": "user",
+                            "parts": [{ "text": prompt }]
+                        }],
+                        ...config
+                    };
+                    
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`API response error: ${response.status} ${response.statusText}`);
+                    }
+
+                    const result = await response.json();
+                    return result;
+                } catch (error) {
+                    console.error('Error fetching from Gemini API:', error);
+                    return { error: 'Sorry, an error occurred. Please try again.' };
+                }
+            }
+
+            async function handleUserInput() {
+                const userMessage = userInput.value.trim();
+                if (userMessage === '') return;
+                
+                displayMessage(userMessage, 'user');
+                userInput.value = '';
+                showLoading(chatContainer);
+
+                const generalPrompt = `The user asked: "${userMessage}". Act as a knowledgeable tutor for Hindi and provide a concise, helpful answer that teaches the concept. Explain it in a way a student can understand, perhaps with an example if applicable. Keep the response under min 10 words or max 99 words.`;
+                const geminiResponse = await generateContent(generalPrompt);
+                
+                hideLoading();
+
+                const text = geminiResponse?.candidates?.[0]?.content?.parts?.[0]?.text || 'Sorry, I could not generate a response. Please try again.';
+                // Replace markdown bold with HTML bold
+                const formattedText = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+                
+                displayMessage(formattedText, 'ai');
+            }
+
+            sendBtn.addEventListener('click', handleUserInput);
+            userInput.addEventListener('keydown', function(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    handleUserInput();
+                }
+            });
+
+            // --- MCQ Generation Logic ---
+            async function generateAndDisplayMCQs(topic) {
+                mainSection.style.display = 'none';
+                mcqSection.style.display = 'block';
+                mcqTopicTitle.textContent = `MCQs on: ${topic}`;
+                mcqContainer.innerHTML = '';
+                mcqLoader.style.display = 'block';
+
+                const mcqPrompt = `Generate 19 multiple-choice questions about the Hindi topic "${topic}". The response must be a valid JSON array of objects. Each object should have three properties: "question" (string), "options" (an array of 4 strings), and "answer" (string). The "answer" must match one of the options exactly.`;
+                
+                const responseSchema = {
+                    type: "ARRAY",
+                    items: {
+                        type: "OBJECT",
+                        properties: {
+                            "question": { "type": "STRING" },
+                            "options": {
+                                "type": "ARRAY",
+                                "items": { "type": "STRING" },
+                                "minItems": 4,
+                                "maxItems": 4
+                            },
+                            "answer": { "type": "STRING" }
+                        },
+                        "required": ["question", "options", "answer"]
+                    }
+                };
+
+                const generationConfig = {
+                    generationConfig: {
+                        responseMimeType: "application/json",
+                        responseSchema: responseSchema
+                    }
+                };
+
+                const result = await generateContent(mcqPrompt, generationConfig);
+
+                mcqLoader.style.display = 'none';
+
+                if (result.error) {
+                    mcqContainer.innerHTML = `<p style="color:red; text-align:center;">${result.error}</p>`;
+                    return;
+                }
+
+                try {
+                    const jsonString = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (!jsonString) {
+                         mcqContainer.innerHTML = `<p style="color:red; text-align:center;">Could not generate questions. Please try a different topic.</p>`;
+                         return;
+                    }
+                    const mcqs = JSON.parse(jsonString);
+                    mcqs.forEach((mcq, index) => {
+                        const questionDiv = document.createElement('div');
+                        questionDiv.classList.add('mcq-question');
+                        questionDiv.innerHTML = `<p>${index + 1}. ${mcq.question}</p>`;
+                        const optionsList = document.createElement('ul');
+                        optionsList.classList.add('mcq-options');
+                        
+                        mcq.options.forEach(option => {
+                            const optionItem = document.createElement('li');
+                            optionItem.textContent = option;
+                            optionItem.addEventListener('click', () => {
+                                checkAnswer(optionItem, option, mcq.answer, optionsList);
+                            });
+                            optionsList.appendChild(optionItem);
+                        });
+
+                        questionDiv.appendChild(optionsList);
+                        mcqContainer.appendChild(questionDiv);
+                    });
+                } catch (parseError) {
+                    console.error('Failed to parse JSON:', parseError);
+                    mcqContainer.innerHTML = `<p style="color:red; text-align:center;">Failed to generate MCQs. The AI provided an invalid format. Please try again.</p>`;
+                }
+            }
+
+            function checkAnswer(selectedOption, selectedText, correctAnswer, optionsList) {
+                optionsList.querySelectorAll('li').forEach(li => {
+                    li.style.pointerEvents = 'none'; // Disable further clicks
+                    if (li.textContent === correctAnswer) {
+                        li.classList.add('correct');
+                    }
+                });
+
+                if (selectedText === correctAnswer) {
+                    selectedOption.classList.add('correct');
+                } else {
+                    selectedOption.classList.add('incorrect');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

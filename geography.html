@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geography - Paro AI ChatBot 🎯</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* CSS Variables for easy maintenance */
+        :root {
+            --color-mcq: #3cb043;
+            --color-notes: #007bff;
+            --border-radius-pill: 50px;
+            --main-font: 'Poppins', Arial, sans-serif;
+
+            /* Light Theme Colors */
+            --background-color: #f0f2f5;
+            --text-color: #333;
+            --card-background: #ffffff;
+            --link-color: #4285f4;
+            --accent-light: #e8f0fe;
+            --chat-background: #f9f9f9;
+            --user-message-color: #d1e7fd;
+            --header-gradient: linear-gradient(135deg, #1a73e8, #4285f4);
+            --shadow-color: rgba(0, 0, 0, 0.2);
+        }
+
+        /* Dark Theme Colors */
+        body.dark-mode {
+            --background-color: #121212;
+            --text-color: #e0e0e0;
+            --card-background: #1e1e1e;
+            --accent-light: #2c2c2c;
+            --chat-background: #1f1f1f;
+            --user-message-color: #333333;
+            --header-gradient: linear-gradient(135deg, #0d3875, #224b89);
+            --shadow-color: rgba(0, 0, 0, 0.5);
+            --link-color: #a0c4ff;
+        }
+
+        /* Base styles for all devices (mobile-first approach) */
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: var(--main-font);
+            margin: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        header {
+            background: var(--header-gradient);
+            padding: 20px;
+            box-shadow: 0 4px 10px var(--shadow-color);
+            text-align: center;
+            position: relative;
+        }
+
+        .header-title h1 {
+            margin: 0;
+            font-size: 1.8em;
+            color: #fff;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .main-content {
+            padding: 15px;
+            max-width: 1200px;
+            margin: 20px auto;
+            overflow-x: hidden;
+        }
+        
+        /* --- Search Section --- */
+        .search-container {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        
+        #chapter-search {
+            width: 100%;
+            max-width: 600px;
+            padding: 12px 20px;
+            font-size: 1em;
+            border-radius: 25px;
+            border: 1px solid #ccc;
+            background-color: var(--card-background);
+            color: var(--text-color);
+            outline: none;
+            box-shadow: 0 2px 6px var(--shadow-color);
+            transition: all 0.3s ease;
+        }
+
+        #chapter-search:focus {
+            border-color: var(--link-color);
+            box-shadow: 0 0 8px rgba(66, 133, 244, 0.5);
+        }
+        
+        /* --- Subject Grid & Cards --- */
+        .subject-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            padding: 15px;
+            background-color: var(--card-background);
+            border-radius: 15px;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            margin-top: 20px;
+        }
+
+        .subject-card {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background-color: var(--accent-light);
+            border-radius: 12px;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+            cursor: default;
+        }
+        
+        .subject-card h3 {
+            margin: 0;
+            font-size: 1.1em;
+            color: var(--text-color);
+            transition: color 0.3s ease;
+        }
+        
+        .subject-card .icon {
+            font-size: 2em;
+            margin-bottom: 8px;
+        }
+
+        /* --- AI Tutor Section --- */
+        .ad-container {
+            margin: 40px 0;
+            text-align: center;
+        }
+
+        .ai-tutor-section {
+            background-color: var(--card-background);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            min-height: 50vh;
+        }
+        
+        .ai-tutor-section h2 {
+            margin-top: 0;
+            color: var(--link-color);
+            text-align: center;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+        }
+
+        .chat-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            background-color: var(--chat-background);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message {
+            padding: 10px 15px;
+            border-radius: 15px;
+            margin-bottom: 10px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .ai-tutor-message {
+            background-color: var(--accent-light);
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+        }
+
+        .user-message {
+            background-color: var(--user-message-color);
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+        }
+
+        .chat-input-area {
+            display: flex;
+            gap: 1px;
+            max-width: 100%; 
+        }
+
+        #user-input {
+            flex-grow: 1;
+            padding: 10px 20px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            font-family: var(--main-font);
+            width: 100%; 
+            background-color: var(--card-background);
+            color: var(--text-color);
+        }
+
+        #send-btn {
+            background-color: var(--link-color);
+            color: #fff;
+            border: none;
+            border-radius: 25px;
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #send-btn:hover {
+            background-color: #3367d6;
+        }
+
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--link-color);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* --- MCQ Section --- */
+        #mcq-section {
+            display: none;
+            padding: 20px;
+            background-color: var(--card-background);
+            border-radius: 15px;
+            box-shadow: 0 4px 12px var(--shadow-color);
+        }
+
+        #mcq-section h2 {
+            margin-top: 0;
+            color: var(--color-mcq);
+            text-align: center;
+            font-size: 2em;
+        }
+        
+        .mcq-question {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            background-color: var(--chat-background);
+        }
+        
+        .mcq-question p {
+            font-weight: bold;
+            margin-top: 0;
+        }
+
+        .mcq-options {
+            list-style: none;
+            padding: 0;
+        }
+
+        .mcq-options li {
+            background-color: var(--accent-light);
+            padding: 10px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .mcq-options li:hover {
+            background-color: var(--link-color);
+            color: #fff;
+        }
+
+        .mcq-options li.correct {
+            background-color: #c8e6c9;
+            border: 2px solid var(--color-mcq);
+        }
+
+        .mcq-options li.incorrect {
+            background-color: #ffcdd2;
+            border: 2px solid #ff0000;
+        }
+
+        #back-btn {
+            background-color: #555;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+        
+        #back-btn:hover {
+            background-color: #333;
+        }
+
+        /* --- Theme Toggle Button --- */
+        #theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.5em;
+            color: #fff;
+            padding: 5px;
+            transition: transform 0.3s ease;
+        }
+
+        #theme-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        /* --- New Buttons Style --- */
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 15px;
+            width: 100%;
+        }
+
+        .generate-mcq-btn, .view-notes-btn, .view-ncert-btn {
+            background-color: var(--color-mcq);
+            color: #fff;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .generate-mcq-btn:hover {
+            background-color: #339c33;
+        }
+        
+        .view-notes-btn {
+            background-color: var(--color-notes);
+        }
+
+        .view-notes-btn:hover {
+            background-color: #0069d9;
+        }
+
+        .view-ncert-btn {
+            background-color: #ff9800; /* Orange for NCERT */
+        }
+
+        .view-ncert-btn:hover {
+            background-color: #e68a00;
+        }
+        
+        .notes-na {
+            color: var(--text-color);
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+        
+        .chapter-category {
+            width: 100%;
+            font-size: 1.5em;
+            color: var(--text-color);
+            font-weight: 600;
+            margin-top: 30px;
+            margin-bottom: 10px;
+        }
+
+        /* --- Media Queries for larger screens --- */
+        @media (min-width: 768px) {
+            .header-title h1 {
+                font-size: 2.5em;
+            }
+
+            .main-content {
+                padding: 20px;
+                margin: 40px auto;
+            }
+            
+            .subject-grid {
+                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+                gap: 20px;
+            }
+
+            .subject-card {
+                padding: 25px;
+            }
+
+            .subject-card h3 {
+                font-size: 1.2em;
+            }
+        }
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 2em;
+            color: #fff;
+            padding: 5px;
+            text-decoration: none;
+            transition: transform 0.3s ease;
+        }
+        .back-button:hover {
+            transform: scale(1.1);
+        }
+    </style>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4518941542970502" crossorigin="anonymous"></script>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <a href="Home.html" class="back-button">←</a>
+            <div class="header-title">
+                <h1>भूगोल 🗺️</h1>
+            </div>
+            <button id="theme-toggle">☀️</button>
+        </div>
+    </header>
+    <main class="main-content">
+        <div class="search-container">
+            <input type="text" id="chapter-search" placeholder="एक अध्याय खोजें...">
+        </div>
+        
+        <section id="main-content-section" class="subject-grid">
+            <h2 class="chapter-category" style="grid-column: 1 / -1;">मानव भूगोल के मूल सिद्धांत</h2>
+            <article class="subject-card" data-chapter="मानव भूगोल: प्रकृति और विषय क्षेत्र">
+                <span class="icon">🌍</span>
+                <h3>मानव भूगोल: प्रकृति और विषय क्षेत्र</h3>
+                <div class="button-group">
+                    <a href="https://ncert.nic.in/textbook/pdf/lhgy101.pdf" target="_blank" class="view-ncert-btn">NCERT Book</a>
+                    <span class="notes-na">नोट्स उपलब्ध नहीं हैं</span>
+                    <button class="generate-mcq-btn">MCQ उत्पन्न करें</button>
+                </div>
+            </article>
+            <article class="subject-card" data-chapter="विश्व जनसंख्या: वितरण, घनत्व और वृद्धि">
+                <span class="icon">📈</span>
+                <h3>विश्व जनसंख्या: वितरण, घनत्व और वृद्धि</h3>
+                <div class="button-group">
+                    <a href="https://ncert.nic.in/textbook/pdf/lhgy102.pdf" target="_blank" class="view-ncert-btn">NCERT Book</a>
+                    <span class="notes-na">नोट्स उपलब्ध नहीं हैं</span>
+                    <button class="generate-mcq-btn">MCQ उत्पन्न करें</button>
+                </div>
+            </article>
+            <article class="subject-card" data-chapter="जनसंख्या संघटन">
+                <span class="icon">📊</span>
+                <h3>जनसंख्या संघटन</h3>
+                <div class="button-group">
+                    <a href="https://ncert.nic.in/textbook/pdf/lhgy103.pdf" target="_blank" class="view-ncert-btn">NCERT Book</a>
+                    <span class="notes-na">नोट्स उपलब्ध नहीं हैं</span>
+                    <button class="generate-mcq-btn">MCQ उत्पन्न करें</button>
+                </div>
+            </article>
+            <article class="subject-card" data-chapter="मानव विकास">
+                <span class="icon">🚶</span>
+                <h3>मानव विकास</h3>
+                <div class="button-group">
+                    <a href="https://ncert.nic.in/textbook/pdf/lhgy104.pdf" target="_blank" class="view-ncert-btn">NCERT Book</a>
+                    <span class="notes-na">नोट्स उपलब्ध नहीं हैं</span>
+                    <button class="generate-mcq-btn">MCQ उत्पन्न करें</button>
+                </div>
+            </article>
+            <article class="subject-card" data-chapter="प्राथमिक क्रियाएँ">
+                <span class="icon">🌾</span>
+                <h3>प्राथमिक क्रियाएँ</h3>
+                <div class="button-group">
+                    <a href="https://ncert.nic.in/textbook/pdf/lhgy105.pdf" target="_blank" class="view-ncert-btn">NCERT Book</a>
+                    <span class="notes-na">नोट्स उपलब्ध नहीं हैं</span>
+                    <button class="generate-mcq-btn">MCQ उत्पन्न करें</button>
+                </div>
+            </article>
+            <article class="subject-card" data-chapter="द्वितीयक क्रियाएँ">
+                <span class="icon">🏭</span>
+                <h3>द्वितीयक क्रियाएँ</h3>
+                <div class="button-group">
+                    <a href="https://ncert.nic.in/textbook/pdf/lhgy106.pdf" target="_blank" class="view-ncert-btn">NCERT Book</a>
+                    <span class="notes-na">नोट्स उपलब्ध नहीं हैं</span>
+                    <button class="generate-mcq-btn">MCQ उत्पन्न करें</button>
+                </div>
+            </article>
+            <article class="subject-card" data-chapter="तृतीयक और चतुर्थक क्रियाकलाप">
+                <span class="icon">🛎️</span>
+                <h3>तृतीयक और चतुर्थक क्रियाकलाप</h3>
+                <div class="button-group">
+                    <a href="https://ncert.nic.in/textbook/pdf/lhgy107.pdf" target="_blank" class="view-ncert-btn">NCERT Book</a>
+                    <span class="notes-na">नोट्स उपलब्ध नहीं हैं</span>
+                    <button class="generate-mcq-btn">MCQ उत्पन्न करें</button>
+                </div>
+            </article>
+            <article class="subject-card" data-chapter="परिवहन और संचार">
+                <span class="icon">🚚</span>
+                <h3>परिवहन और संचार</h3>
+                <div class="button-group">
+                    <a href="https://ncert.nic.in/textbook/pdf/lhgy108.pdf" target="_blank" class="view-ncert-btn">NCERT Book</a>
+                    <span class="notes-na">नोट्स उपलब्ध नहीं हैं</span>
+                    <button class="generate-mcq-btn">MCQ उत्पन्न करें</button>
+                </div>
+            </article>
+            <article class="subject-card" data-chapter="अंतर्राष्ट्रीय व्यापार">
+                <span class="icon">🚢</span>
+                <h3>अंतर्राष्ट्रीय व्यापार</h3>
+                <div class="button-group">
+                    <a href="https://ncert.nic.in/textbook/pdf/lhgy109.pdf" target="_blank" class="view-ncert-btn">NCERT Book</a>
+                    <span class="notes-na">नोट्स उपलब्ध नहीं हैं</span>
+                    <button class="generate-mcq-btn">MCQ उत्पन्न करें</button>
+                </div>
+            </article>
+            <article class="subject-card" data-chapter="मानव बस्तियाँ">
+                <span class="icon">🏠</span>
+                <h3>मानव बस्तियाँ</h3>
+                <div class="button-group">
+                    <a href="https://ncert.nic.in/textbook/pdf/lhgy110.pdf" target="_blank" class="view-ncert-btn">NCERT Book</a>
+                    <span class="notes-na">नोट्स उपलब्ध नहीं हैं</span>
+                    <button class="generate-mcq-btn">MCQ उत्पन्न करें</button>
+                </div>
+            </article>
+            <h2 class="chapter-category" style="grid-column: 1 / -1;">भारत: लोग और अर्थव्यवस्था</h2>
+            <article class="subject-card" data-chapter="जनसंख्या: वितरण, घनत्व, वृद्धि और संघटन">
+                <span class="icon">🇮🇳</span>
+                <h3>जनसंख्या: वितरण, घनत्व, वृद्धि और संघटन</h3>
+                <div class="button-group">
+                    <a href="https://ncert.nic.in/textbook/pdf/lhgy201.pdf" target="_blank" class="view-ncert-btn">NCERT Book</a>
+                    <span class="notes-na">नोट्स उपलब्ध नहीं हैं</span>
+                    <button class="generate-mcq-btn">MCQ उत्पन्न करें</button>
+                </div>
+            </article>
+            <article class="subject-card" data-chapter="प्रवास: प्रकार, कारण और परिणाम">
+                <span class="icon">✈️</span>
+                <h3>प्रवास: प्रकार, कारण और परिणाम</h3>
+                <div class="button-group">
+                    <a href="https://ncert.nic.in/textbook/pdf/lhgy202.pdf" target="_blank" class="view-ncert-btn">NCERT Book</a>
+                    <span class="notes-na">नोट्स उपलब्ध नहीं हैं</span>
+                    <button class="generate-mcq-btn">MCQ उत्पन्न करें</button>
+                </div>
+            </article>
+            <article class="subject-card" data-chapter="मानव विकास">
+                <span class="icon">👨‍👩‍👧‍👦</span>
+                <h3>मानव विकास</h3>
+                <div class="button-group">
+                    <a href="https://ncert.nic.in/textbook/pdf/lhgy203.pdf" target="_blank" class="view-ncert-btn">NCERT Book</a>
+                    <span class="notes-na">नोट्स उपलब्ध नहीं हैं</span>
+                    <button class="generate-mcq-btn">MCQ उत्पन्न करें</button>
+                </div>
+            </article>
+            <article class="subject-card" data-chapter="मानव बस्तियाँ">
+                <span class="icon">🏘️</span>
+                <h3>मानव बस्तियाँ</h3>
+                <div class="button-group">
+                    <a href="https://ncert.nic.in/textbook/pdf/lhgy204.pdf" target="_blank" class="view-ncert-btn">NCERT Book</a>
+                    <span class="notes-na">नोट्स उपलब्ध नहीं हैं</span>
+                    <button class="generate-mcq-btn">MCQ उत्पन्न करें</button>
+                </div>
+            </article>
+            <article class="subject-card" data-chapter="भू-संसाधन और कृषि">
+                <span class="icon">🏞️</span>
+                <h3>भू-संसाधन और कृषि</h3>
+                <div class="button-group">
+                    <a href="https://ncert.nic.in/textbook/pdf/lhgy205.pdf" target="_blank" class="view-ncert-btn">NCERT Book</a>
+                    <span class="notes-na">नोट्स उपलब्ध नहीं हैं</span>
+                    <button class="generate-mcq-btn">MCQ उत्पन्न करें</button>
+                </div>
+            </article>
+            <article class="subject-card" data-chapter="जल संसाधन">
+                <span class="icon">💧</span>
+                <h3>जल संसाधन</h3>
+                <div class="button-group">
+                    <a href="https://ncert.nic.in/textbook/pdf/lhgy206.pdf" target="_blank" class="view-ncert-btn">NCERT Book</a>
+                    <span class="notes-na">नोट्स उपलब्ध नहीं हैं</span>
+                    <button class="generate-mcq-btn">MCQ उत्पन्न करें</button>
+                </div>
+            </article>
+            <article class="subject-card" data-chapter="खनिज और ऊर्जा संसाधन">
+                <span class="icon">⛏️</span>
+                <h3>खनिज और ऊर्जा संसाधन</h3>
+                <div class="button-group">
+                    <a href="https://ncert.nic.in/textbook/pdf/lhgy207.pdf" target="_blank" class="view-ncert-btn">NCERT Book</a>
+                    <span class="notes-na">नोट्स उपलब्ध नहीं हैं</span>
+                    <button class="generate-mcq-btn">MCQ उत्पन्न करें</button>
+                </div>
+            </article>
+            <article class="subject-card" data-chapter="निर्माण उद्योग">
+                <span class="icon">🏗️</span>
+                <h3>निर्माण उद्योग</h3>
+                <div class="button-group">
+                    <a href="https://ncert.nic.in/textbook/pdf/lhgy208.pdf" target="_blank" class="view-ncert-btn">NCERT Book</a>
+                    <span class="notes-na">नोट्स उपलब्ध नहीं हैं</span>
+                    <button class="generate-mcq-btn">MCQ उत्पन्न करें</button>
+                </div>
+            </article>
+            <article class="subject-card" data-chapter="भारत के संदर्भ में नियोजन और सतत विकास">
+                <span class="icon">🌱</span>
+                <h3>भारत के संदर्भ में नियोजन और सतत विकास</h3>
+                <div class="button-group">
+                    <a href="https://ncert.nic.in/textbook/pdf/lhgy209.pdf" target="_blank" class="view-ncert-btn">NCERT Book</a>
+                    <span class="notes-na">नोट्स उपलब्ध नहीं हैं</span>
+                    <button class="generate-mcq-btn">MCQ उत्पन्न करें</button>
+                </div>
+            </article>
+            <article class="subject-card" data-chapter="परिवहन और संचार">
+                <span class="icon">📡</span>
+                <h3>परिवहन और संचार</h3>
+                <div class="button-group">
+                    <span class="notes-na">नोट्स उपलब्ध नहीं हैं</span>
+                    <button class="generate-mcq-btn">MCQ उत्पन्न करें</button>
+                </div>
+            </article>
+            <article class="subject-card" data-chapter="अंतर्राष्ट्रीय व्यापार">
+                <span class="icon">🌐</span>
+                <h3>अंतर्राष्ट्रीय व्यापार</h3>
+                <div class="button-group">
+                    <a href="https://ncert.nic.in/textbook/pdf/lhgy211.pdf" target="_blank" class="view-ncert-btn">NCERT Book</a>
+                    <span class="notes-na">नोट्स उपलब्ध नहीं हैं</span>
+                    <button class="generate-mcq-btn">MCQ उत्पन्न करें</button>
+                </div>
+            </article>
+            <article class="subject-card" data-chapter="भौगोलिक परिप्रेक्ष्य में चयनित मुद्दे और समस्याएं">
+                <span class="icon">🗺️</span>
+                <h3>भौगोलिक परिप्रेक्ष्य में चयनित मुद्दे और समस्याएं</h3>
+                <div class="button-group">
+                    <a href="https://ncert.nic.in/textbook/pdf/lhgy212.pdf" target="_blank" class="view-ncert-btn">NCERT Book</a>
+                    <span class="notes-na">नोट्स उपलब्ध नहीं हैं</span>
+                    <button class="generate-mcq-btn">MCQ उत्पन्न करें</button>
+                </div>
+            </article>
+        </section>
+
+        <section id="mcq-section">
+            <button id="back-btn">← मुख्य पर वापस जाएं</button>
+            <h2 id="mcq-topic-title"></h2>
+            <div id="mcq-container"></div>
+            <div id="mcq-loader" class="loader" style="display:none;"></div>
+        </section>
+
+        <section class="ai-tutor-section">
+            <h2>पारो एआई ट्यूटर ✨</h2>
+            <div id="chat-container" class="chat-container">
+                <div class="message ai-tutor-message">नमस्ते! मैं पारो एआई हूँ। मैं आपकी किस भूगोल विषय में मदद कर सकता हूँ?</div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" id="user-input" placeholder="एक क्षेत्र, अवधारणा, या विशेषता के बारे में पूछें...">
+                <button id="send-btn">भेजें</button>
+            </div>
+        </section>
+    </main>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const GEMINI_API_KEY = 'IzaSyC01GOYx2f7b_17j0upJk_rS_j1pL8SjY'; // Replace with your actual API key
+            const chatContainer = document.getElementById('chat-container');
+            const userInput = document.getElementById('user-input');
+            const sendBtn = document.getElementById('send-btn');
+            const themeToggle = document.getElementById('theme-toggle');
+            const body = document.body;
+
+            // --- Theme Toggle ---
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '🌙';
+            } else {
+                themeToggle.textContent = '☀️';
+            }
+
+            themeToggle.addEventListener('click', () => {
+                body.classList.toggle('dark-mode');
+                const isDarkMode = body.classList.contains('dark-mode');
+                themeToggle.textContent = isDarkMode ? '🌙' : '☀️';
+                localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+            });
+
+            // --- Chat Functionality ---
+            sendBtn.addEventListener('click', handleUserInput);
+            userInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    handleUserInput();
+                }
+            });
+
+            function displayMessage(message, sender, isHtml = false) {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('message', `${sender}-message`);
+                if (isHtml) {
+                    messageElement.innerHTML = message;
+                } else {
+                    messageElement.textContent = message;
+                }
+                chatContainer.appendChild(messageElement);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+
+            function showLoading() {
+                const loaderElement = document.createElement('div');
+                loaderElement.classList.add('message', 'ai-tutor-message', 'loader-message');
+                loaderElement.innerHTML = '<div class="loader"></div>';
+                chatContainer.appendChild(loaderElement);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+
+            function hideLoading() {
+                const loader = chatContainer.querySelector('.loader-message');
+                if (loader) {
+                    chatContainer.removeChild(loader);
+                }
+            }
+
+            async function generateContent(userMessage) {
+                showLoading();
+                const generalPrompt = `The user asked: "${userMessage}". Act as a knowledgeable tutor for Geography, covering topics from both "Fundamentals of Human Geography" and "India: People and Economy". This includes concepts like population distribution, human development, economic activities (primary, secondary, tertiary), transport, international trade, and specific issues related to India. Provide a comprehensive yet easy-to-understand explanation. If the user asks a question outside this scope, politely decline and guide them back to Geography topics. Format your response clearly, using headings, bullet points, or numbered lists if it helps with readability. Ensure the tone is encouraging and educational.`;
+
+                try {
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${GEMINI_API_KEY}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            "contents": [{
+                                "parts": [{
+                                    "text": generalPrompt
+                                }]
+                            }],
+                            "generationConfig": {
+                                "temperature": 0.7,
+                                "topK": 40,
+                                "topP": 0.95,
+                                "maxOutputTokens": 1024,
+                            }
+                        })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`API error! status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    const aiResponse = data.candidates[0].content.parts[0].text;
+                    
+                    // Basic Markdown to HTML conversion
+                    let formattedResponse = aiResponse
+                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold
+                        .replace(/\*(.*?)\*/g, '<em>$1</em>')       // Italics
+                        .replace(/(\r\n|\n|\r)/g, '<br>');      // Line breaks
+
+                    hideLoading();
+                    displayMessage(formattedResponse, 'ai-tutor', true);
+
+                } catch (error) {
+                    hideLoading();
+                    console.error("Error fetching from Gemini API:", error);
+                    displayMessage("I'm having trouble connecting to my knowledge base. Please check the API key and try again later.", 'ai-tutor');
+                }
+            }
+
+            function handleUserInput() {
+                const userMessage = userInput.value.trim();
+                if (userMessage) {
+                    displayMessage(userMessage, 'user');
+                    userInput.value = '';
+                    generateContent(userMessage);
+                }
+            }
+             // --- Search Logic ---
+            const chapterSearch = document.getElementById('chapter-search');
+            chapterSearch.addEventListener('keyup', () => {
+                const query = chapterSearch.value.toLowerCase();
+                document.querySelectorAll('.subject-card').forEach(card => {
+                    const chapterTitle = card.dataset.chapter.toLowerCase();
+                    if (chapterTitle.includes(query)) {
+                        card.style.display = 'flex';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

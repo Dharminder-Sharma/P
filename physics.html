@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Physics - Paro AI ChatBot 🎯</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* CSS Variables for easy maintenance */
+        :root {
+            --color-mcq: #3cb043;
+            --color-notes: #007bff;
+            --border-radius-pill: 50px;
+            --main-font: 'Poppins', Arial, sans-serif;
+
+            /* Light Theme Colors */
+            --background-color: #f0f2f5;
+            --text-color: #333;
+            --card-background: #ffffff;
+            --link-color: #4285f4;
+            --accent-light: #e8f0fe;
+            --chat-background: #f9f9f9;
+            --user-message-color: #d1e7fd;
+            --header-gradient: linear-gradient(135deg, #1a73e8, #4285f4);
+            --shadow-color: rgba(0, 0, 0, 0.2);
+        }
+
+        /* Dark Theme Colors */
+        body.dark-mode {
+            --background-color: #121212;
+            --text-color: #e0e0e0;
+            --card-background: #1e1e1e;
+            --accent-light: #2c2c2c;
+            --chat-background: #1f1f1f;
+            --user-message-color: #333333;
+            --header-gradient: linear-gradient(135deg, #0d3875, #224b89);
+            --shadow-color: rgba(0, 0, 0, 0.5);
+            --link-color: #a0c4ff;
+        }
+
+        /* Base styles for all devices (mobile-first approach) */
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: var(--main-font);
+            margin: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        header {
+            background: var(--header-gradient);
+            padding: 20px;
+            box-shadow: 0 4px 10px var(--shadow-color);
+            text-align: center;
+            position: relative;
+        }
+
+        .header-title h1 {
+            margin: 0;
+            font-size: 1.8em;
+            color: #fff;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .main-content {
+            padding: 15px;
+            max-width: 1200px;
+            margin: 20px auto;
+            overflow-x: hidden;
+        }
+        
+        /* --- Search Section --- */
+        .search-container {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        
+        #chapter-search {
+            width: 100%;
+            max-width: 600px;
+            padding: 12px 20px;
+            font-size: 1em;
+            border-radius: 25px;
+            border: 1px solid #ccc;
+            background-color: var(--card-background);
+            color: var(--text-color);
+            outline: none;
+            box-shadow: 0 2px 6px var(--shadow-color);
+            transition: all 0.3s ease;
+        }
+
+        #chapter-search:focus {
+            border-color: var(--link-color);
+            box-shadow: 0 0 8px rgba(66, 133, 244, 0.5);
+        }
+        
+        /* --- Subject Grid & Cards --- */
+        .subject-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            padding: 15px;
+            background-color: var(--card-background);
+            border-radius: 15px;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            margin-top: 20px;
+        }
+
+        .subject-card {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background-color: var(--accent-light);
+            border-radius: 12px;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+            cursor: default;
+        }
+        
+        .subject-card h3 {
+            margin: 0;
+            font-size: 1.1em;
+            color: var(--text-color);
+            transition: color 0.3s ease;
+        }
+        
+        .subject-card .icon {
+            font-size: 2em;
+            margin-bottom: 8px;
+        }
+
+        /* --- AI Tutor Section --- */
+        .ad-container {
+            margin: 40px 0;
+            text-align: center;
+        }
+
+        .ai-tutor-section {
+            background-color: var(--card-background);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            min-height: 50vh;
+        }
+        
+        .ai-tutor-section h2 {
+            margin-top: 0;
+            color: var(--link-color);
+            text-align: center;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+        }
+
+        .chat-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            background-color: var(--chat-background);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message {
+            padding: 10px 15px;
+            border-radius: 15px;
+            margin-bottom: 10px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .ai-tutor-message {
+            background-color: var(--accent-light);
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+        }
+
+        .user-message {
+            background-color: var(--user-message-color);
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+        }
+
+        .chat-input-area {
+            display: flex;
+            gap: 1px;
+            max-width: 100%; 
+        }
+
+        #user-input {
+            flex-grow: 1;
+            padding: 10px 20px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            font-family: var(--main-font);
+            width: 100%; 
+            background-color: var(--card-background);
+            color: var(--text-color);
+        }
+
+        #send-btn {
+            background-color: var(--link-color);
+            color: #fff;
+            border: none;
+            border-radius: 25px;
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #send-btn:hover {
+            background-color: #3367d6;
+        }
+
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--link-color);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* --- MCQ Section --- */
+        #mcq-section {
+            display: none;
+            padding: 20px;
+            background-color: var(--card-background);
+            border-radius: 15px;
+            box-shadow: 0 4px 12px var(--shadow-color);
+        }
+
+        #mcq-section h2 {
+            margin-top: 0;
+            color: var(--color-mcq);
+            text-align: center;
+            font-size: 2em;
+        }
+        
+        .mcq-question {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            background-color: var(--chat-background);
+        }
+        
+        .mcq-question p {
+            font-weight: bold;
+            margin-top: 0;
+        }
+
+        .mcq-options {
+            list-style: none;
+            padding: 0;
+        }
+
+        .mcq-options li {
+            background-color: var(--accent-light);
+            padding: 10px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .mcq-options li:hover {
+            background-color: var(--link-color);
+            color: #fff;
+        }
+
+        .mcq-options li.correct {
+            background-color: #c8e6c9;
+            border: 2px solid var(--color-mcq);
+        }
+
+        .mcq-options li.incorrect {
+            background-color: #ffcdd2;
+            border: 2px solid #ff0000;
+        }
+
+        #back-btn {
+            background-color: #555;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+        
+        #back-btn:hover {
+            background-color: #333;
+        }
+
+        /* --- Theme Toggle Button --- */
+        #theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.5em;
+            color: #fff;
+            padding: 5px;
+            transition: transform 0.3s ease;
+        }
+
+        #theme-toggle:hover {
+            transform: scale(1.1);
+        }
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 2em;
+            color: #fff;
+            padding: 5px;
+            text-decoration: none;
+            transition: transform 0.3s ease;
+        }
+
+        .back-button:hover {
+            transform: scale(1.1);
+        }
+
+        /* --- New Buttons Style --- */
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 15px;
+            width: 100%;
+        }
+
+        .generate-mcq-btn, .view-notes-btn, .view-ncert-btn {
+            background-color: var(--color-mcq);
+            color: #fff;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .generate-mcq-btn:hover {
+            background-color: #339c33;
+        }
+        
+        .view-notes-btn {
+            background-color: var(--color-notes);
+        }
+
+        .view-notes-btn:hover, .view-ncert-btn:hover {
+            background-color: #0069d9;
+        }
+        
+        .view-ncert-btn {
+            background-color: #ff9800; /* Orange color for NCERT button */
+        }
+
+        .view-ncert-btn:hover {
+            background-color: #f57c00;
+        }
+        
+        .notes-na {
+            color: var(--text-color);
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+
+        /* --- Media Queries for larger screens --- */
+        @media (min-width: 768px) {
+            .header-title h1 {
+                font-size: 2.5em;
+            }
+
+            .main-content {
+                padding: 20px;
+                margin: 40px auto;
+            }
+            
+            .subject-grid {
+                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+                gap: 20px;
+            }
+
+            .subject-card {
+                padding: 25px;
+            }
+
+            .subject-card h3 {
+                font-size: 1.2em;
+            }
+        }
+    </style>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4518941542970502" crossorigin="anonymous"></script>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <a href="Home.html" class="back-button">←</a>
+            <div class="header-title">
+                <h1>Physics ⚛️</h1>
+            </div>
+            <button id="theme-toggle">☀️</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="search-container">
+            <input type="text" id="chapter-search" placeholder="Search for a chapter...">
+        </div>
+        
+        <section id="main-content-section" class="subject-grid">
+            <article class="subject-card" data-chapter="Electric Charges & Fields">
+                <span class="icon">💡</span>
+                <h3>Electric Charges & Fields</h3>
+                <div class="button-group">
+                    <a href="https://drive.google.com/file/d/1NA6ugl2z76sq99xytd_TiePu91U1jW_R/view" target="_blank" class="view-notes-btn">View Notes</a>
+                    <a href="https://ncert.nic.in/textbook/pdf/leph101.pdf" target="_blank" class="view-ncert-btn">NCERT Book</a>
+                    <button class="generate-mcq-btn">Generate MCQ</button>
+                </div>
+            </article>
+            <article class="subject-card" data-chapter="Electrostatic Potential & Capacitance">
+                <span class="icon">🔋</span>
+                <h3>Electrostatic Potential & Capacitance</h3>
+                <div class="button-group">
+                    <a href="https://drive.google.com/file/d/1NKSu7xRHupIPLy-VXgmxvukzSzhyQkyR/view" target="_blank" class="view-notes-btn">View Notes</a>
+                    <a href="https://ncert.nic.in/textbook/pdf/leph102.pdf" target="_blank" class="view-ncert-btn">NCERT Book</a>
+                    <button class="generate-mcq-btn">Generate MCQ</button>
+                </div>
+            </article>
+            <article class="subject-card" data-chapter="Current Electricity">
+                <span class="icon">⚡</span>
+                <h3>Current Electricity</h3>
+                <div class="button-group">
+                    <a href="https://drive.google.com/file/d/1NKupP-g2uEZhd6NDhhSVBwUHJmuR2gGP/view" target="_blank" class="view-notes-btn">View Notes</a>
+                    <a href="https://ncert.nic.in/textbook/pdf/leph103.pdf" target="_blank" class="view-ncert-btn">NCERT Book</a>
+                    <button class="generate-mcq-btn">Generate MCQ</button>
+                </div>
+            </article>
+            <article class="subject-card" data-chapter="Moving Charges & Magnetism">
+                <span class="icon">➡️</span>
+                <h3>Moving Charges & Magnetism</h3>
+                <div class="button-group">
+                    <a href="https://drive.google.com/file/d/1_cHr-3kNaldC-k5ZYj3JztrOOl-Fu8Wg/view" target="_blank" class="view-notes-btn">View Notes</a>
+                    <a href="https://ncert.nic.in/textbook/pdf/leph104.pdf" target="_blank" class="view-ncert-btn">NCERT Book</a>
+                    <button class="generate-mcq-btn">Generate MCQ</button>
+                </div>
+            </article>
+            <article class="subject-card" data-chapter="Magnetism & Matter">
+                <span class="icon">🧲</span>
+                <h3>Magnetism & Matter</h3>
+                <div class="button-group">
+                    <a href="https://drive.google.com/file/d/1apCYtkL4jImyKTCCCjlxucDxCwgY2tUT/view" target="_blank" class="view-notes-btn">View Notes</a>
+                    <a href="https://ncert.nic.in/textbook/pdf/leph105.pdf" target="_blank" class="view-ncert-btn">NCERT Book</a>
+                    <button class="generate-mcq-btn">Generate MCQ</button>
+                </div>
+            </article>
+            <article class="subject-card" data-chapter="Electromagnetic Induction">
+                <span class="icon">🌀</span>
+                <h3>Electromagnetic Induction</h3>
+                <div class="button-group">
+                    <a href="https://drive.google.com/file/d/1asxnN5V1HXEPrbxKc8Qyf4iY4BvIP3wv/view" target="_blank" class="view-notes-btn">View Notes</a>
+                    <a href="https://ncert.nic.in/textbook/pdf/leph106.pdf" target="_blank" class="view-ncert-btn">NCERT Book</a>
+                    <button class="generate-mcq-btn">Generate MCQ</button>
+                </div>
+            </article>
+            <article class="subject-card" data-chapter="Alternating Current">
+                <span class="icon">〰️</span>
+                <h3>Alternating Current</h3>
+                <div class="button-group">
+                    <a href="https://drive.google.com/file/d/1d7rCvwxC_u6pULtQj_QXw0QF2R_hNyMP/view" target="_blank" class="view-notes-btn">View Notes</a>
+                    <a href="https://ncert.nic.in/textbook/pdf/leph107.pdf" target="_blank" class="view-ncert-btn">NCERT Book</a>
+                    <button class="generate-mcq-btn">Generate MCQ</button>
+                </div>
+            </article>
+            <article class="subject-card" data-chapter="Electromagnetic Wave">
+                <span class="icon">📡</span>
+                <h3>Electromagnetic Wave</h3>
+                <div class="button-group">
+                    <a href="https://drive.google.com/file/d/1dQljUdjc_5vsDdkxhCPswQKf4vDF517E/view" target="_blank" class="view-notes-btn">View Notes</a>
+                    <a href="https://ncert.nic.in/textbook/pdf/leph108.pdf" target="_blank" class="view-ncert-btn">NCERT Book</a>
+                    <button class="generate-mcq-btn">Generate MCQ</button>
+                </div>
+            </article>
+            <article class="subject-card" data-chapter="Ray Optics">
+                <span class="icon">🔍</span>
+                <h3>Ray Optics</h3>
+                <div class="button-group">
+                    <span class="notes-na">Notes Not Available</span>
+                    <a href="https://ncert.nic.in/textbook/pdf/leph201.pdf" target="_blank" class="view-ncert-btn">NCERT Book</a>
+                    <button class="generate-mcq-btn">Generate MCQ</button>
+                </div>
+            </article>
+            <article class="subject-card" data-chapter="Wave Optics">
+                <span class="icon">🌊</span>
+                <h3>Wave Optics</h3>
+                <div class="button-group">
+                    <a href="https://drive.google.com/file/d/1d6qhQnPCfRvtSSjOH5UCTo-q07TShw0M/view" target="_blank" class="view-notes-btn">View Notes</a>
+                    <a href="https://ncert.nic.in/textbook/pdf/leph202.pdf" target="_blank" class="view-ncert-btn">NCERT Book</a>
+                    <button class="generate-mcq-btn">Generate MCQ</button>
+                </div>
+            </article>
+            <article class="subject-card" data-chapter="Dual Nature of Radiations & Matter">
+                <span class="icon">⚛️</span>
+                <h3>Dual Nature of Radiations & Matter</h3>
+                <div class="button-group">
+                    <a href="https://drive.google.com/file/d/1dS78KNHXO6I5ZQToBKEbUibYspO3nr5Y/view" target="_blank" class="view-notes-btn">View Notes</a>
+                    <a href="https://ncert.nic.in/textbook/pdf/leph203.pdf" target="_blank" class="view-ncert-btn">NCERT Book</a>
+                    <button class="generate-mcq-btn">Generate MCQ</button>
+                </div>
+            </article>
+            <article class="subject-card" data-chapter="Atoms">
+                <span class="icon">⚛️</span>
+                <h3>Atoms</h3>
+                <div class="button-group">
+                    <a href="https://drive.google.com/file/d/1dA_fpP95g49ZG8HT_sgogbdVZqxK2Uyt/view" target="_blank" class="view-notes-btn">View Notes</a>
+                    <a href="https://ncert.nic.in/textbook/pdf/leph204.pdf" target="_blank" class="view-ncert-btn">NCERT Book</a>
+                    <button class="generate-mcq-btn">Generate MCQ</button>
+                </div>
+            </article>
+            <article class="subject-card" data-chapter="Nuclei">
+                <span class="icon">💥</span>
+                <h3>Nuclei</h3>
+                <div class="button-group">
+                    <a href="https://drive.google.com/file/d/1dLD9Ip9KeERjX_Zk_PNJjPknKnL6cVIX/view" target="_blank" class="view-notes-btn">View Notes</a>
+                    <a href="https://ncert.nic.in/textbook/pdf/leph205.pdf" target="_blank" class="view-ncert-btn">NCERT Book</a>
+                    <button class="generate-mcq-btn">Generate MCQ</button>
+                </div>
+            </article>
+            <article class="subject-card" data-chapter="Semiconductor">
+                <span class="icon">💻</span>
+                <h3>Semiconductor</h3>
+                <div class="button-group">
+                    <a href="https://drive.google.com/file/d/1dIo5VbMSzcZSAqPIi2_Dh7i-wJHEI7tD/view" target="_blank" class="view-notes-btn">View Notes</a>
+                    <a href="https://ncert.nic.in/textbook/pdf/leph206.pdf" target="_blank" class="view-ncert-btn">NCERT Book</a>
+                    <button class="generate-mcq-btn">Generate MCQ</button>
+                </div>
+            </article>
+            <article class="subject-card" data-chapter="Communication System">
+                <span class="icon">📱</span>
+                <h3>Communication System</h3>
+                <div class="button-group">
+                    <a href="https://drive.google.com/file/d/1dTrBHitSraScMLX_MhVkS032rpGlCMNP/view" target="_blank" class="view-notes-btn">View Notes</a>
+                    <a href="https://ncert.nic.in/textbook/pdf/leph207.pdf" target="_blank" class="view-ncert-btn">NCERT Book</a>
+                    <button class="generate-mcq-btn">Generate MCQ</button>
+                </div>
+            </article>
+        </section>
+
+        <section id="mcq-section">
+            <button id="back-btn">← Back to Main Topics</button>
+            <h2 id="mcq-topic-title"></h2>
+            <div id="mcq-container"></div>
+            <div id="mcq-loader" class="loader" style="display:none;"></div>
+        </section>
+
+                <section class="ai-tutor-section">
+            <h2>Paro AI Tutor ✨</h2>
+            <div id="chat-container" class="chat-container">
+                <div class="message ai-tutor-message">Hello! I'm Paro AI, Created by Dharminder Sharma. What topic do you want to study today? </div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" id="user-input" placeholder="Type your query...">
+                <button id="send-btn">Send</button>
+            </div>
+        </section>
+
+        <div class="ad-container">
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-format="fluid"
+                 data-ad-layout-key="-fb+5w+4e-db+86"
+                 data-ad-client="ca-pub-4518941542970502"
+                 data-ad-slot="5357825691"></ins>
+            <script>
+                 (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // DOM elements for page transitions
+            const mainContentSection = document.getElementById('main-content-section');
+            const mcqSection = document.getElementById('mcq-section');
+            const mcqContainer = document.getElementById('mcq-container');
+            const mcqLoader = document.getElementById('mcq-loader');
+            const backBtn = document.getElementById('back-btn');
+            const mcqTopicTitle = document.getElementById('mcq-topic-title');
+            const chapterSearch = document.getElementById('chapter-search');
+
+            // --- Theme Toggle Logic ---
+            const themeToggleBtn = document.getElementById('theme-toggle');
+            const body = document.body;
+            
+            // Check for saved theme in localStorage
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                body.classList.add('dark-mode');
+                themeToggleBtn.textContent = '🌙';
+            } else {
+                body.classList.remove('dark-mode');
+                themeToggleBtn.textContent = '☀️';
+            }
+
+            themeToggleBtn.addEventListener('click', () => {
+                body.classList.toggle('dark-mode');
+                if (body.classList.contains('dark-mode')) {
+                    themeToggleBtn.textContent = '🌙';
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    themeToggleBtn.textContent = '☀️';
+                    localStorage.setItem('theme', 'light');
+                }
+            });
+
+            function showMainContent() {
+                mainContentSection.style.display = 'grid';
+                mcqSection.style.display = 'none';
+                mcqContainer.innerHTML = '';
+            }
+
+            backBtn.addEventListener('click', showMainContent);
+
+            // --- Chapter Search Logic ---
+            chapterSearch.addEventListener('keyup', () => {
+                const query = chapterSearch.value.toLowerCase();
+                const cards = document.querySelectorAll('.subject-card');
+                
+                cards.forEach(card => {
+                    const chapterName = card.querySelector('h3').textContent.toLowerCase();
+                    if (chapterName.includes(query)) {
+                        card.style.display = 'flex';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+
+            // Logic for "Generate MCQ" button clicks
+            document.querySelectorAll('.generate-mcq-btn').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    const chapterName = event.target.closest('.subject-card').getAttribute('data-chapter');
+                    generateAndDisplayMCQs(chapterName);
+                });
+            });
+
+            // --- AI Tutor script ---
+            const apiKey = 'AIzaSyCPx64eOZUtsiZ-DkRYwXGssF1qsOdj4FA';
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+            const chatContainer = document.getElementById('chat-container');
+            const userInput = document.getElementById('user-input');
+            const sendBtn = document.getElementById('send-btn');
+
+            function displayMessage(content, sender) {
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('message');
+                messageDiv.classList.add(sender === 'user' ? 'user-message' : 'ai-tutor-message');
+                
+                messageDiv.innerHTML = content;
+                
+                chatContainer.appendChild(messageDiv);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+
+            function showLoading(container) {
+                const loadingDiv = document.createElement('div');
+                loadingDiv.classList.add('loader');
+                loadingDiv.id = 'loader';
+                container.appendChild(loadingDiv);
+                container.scrollTop = container.scrollHeight;
+            }
+
+            function hideLoading() {
+                const loader = document.getElementById('loader');
+                if (loader) {
+                    loader.remove();
+                }
+            }
+
+            async function generateContent(prompt, config = {}) {
+                try {
+                    const payload = {
+                        "contents": [{
+                            "role": "user",
+                            "parts": [{ "text": prompt }]
+                        }],
+                        ...config
+                    };
+                    
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`API response error: ${response.status} ${response.statusText}`);
+                    }
+
+                    const result = await response.json();
+                    return result;
+                } catch (error) {
+                    console.error('Error fetching from Gemini API:', error);
+                    return { error: 'Sorry, an error occurred. Please try again.' };
+                }
+            }
+
+            async function handleUserInput() {
+                const userMessage = userInput.value.trim();
+                if (userMessage === '') return;
+                
+                displayMessage(userMessage, 'user');
+                userInput.value = '';
+                showLoading(chatContainer);
+
+                const generalPrompt = `The user asked: "${userMessage}". Act as a knowledgeable tutor for Physics and provide a concise, helpful answer that teaches the concept. Explain it in a way a student can understand, perhaps with an example if applicable. Keep the response under min 10 words or max 99 words.`;
+                const geminiResponse = await generateContent(generalPrompt);
+                
+                hideLoading();
+
+                const text = geminiResponse?.candidates?.[0]?.content?.parts?.[0]?.text || 'Sorry, I could not generate a response. Please try again.';
+                // Replace markdown bold with HTML bold
+                const formattedText = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+                
+                displayMessage(formattedText, 'ai');
+            }
+
+            sendBtn.addEventListener('click', handleUserInput);
+            userInput.addEventListener('keydown', function(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    handleUserInput();
+                }
+            });
+
+            // --- MCQ Generation Logic ---
+            async function generateAndDisplayMCQs(topic) {
+                mainContentSection.style.display = 'none';
+                mcqSection.style.display = 'block';
+                mcqTopicTitle.textContent = `MCQs on: ${topic}`;
+                mcqContainer.innerHTML = '';
+                mcqLoader.style.display = 'block';
+
+                const mcqPrompt = `Generate 19 multiple-choice questions about the Physics topic "${topic}". The response must be a valid JSON array of objects. Each object should have three properties: "question" (string), "options" (an array of 4 strings), and "answer" (string). The "answer" must match one of the options exactly.`;
+                
+                const responseSchema = {
+                    type: "ARRAY",
+                    items: {
+                        type: "OBJECT",
+                        properties: {
+                            "question": { "type": "STRING" },
+                            "options": {
+                                "type": "ARRAY",
+                                "items": { "type": "STRING" },
+                                "minItems": 4,
+                                "maxItems": 4
+                            },
+                            "answer": { "type": "STRING" }
+                        },
+                        "required": ["question", "options", "answer"]
+                    }
+                };
+
+                const generationConfig = {
+                    generationConfig: {
+                        responseMimeType: "application/json",
+                        responseSchema: responseSchema
+                    }
+                };
+
+                const result = await generateContent(mcqPrompt, generationConfig);
+
+                mcqLoader.style.display = 'none';
+
+                if (result.error) {
+                    mcqContainer.innerHTML = `<p style="color:red; text-align:center;">${result.error}</p>`;
+                    return;
+                }
+
+                try {
+                    const jsonString = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (!jsonString) {
+                         mcqContainer.innerHTML = `<p style="color:red; text-align:center;">Could not generate questions. Please try a different topic.</p>`;
+                         return;
+                    }
+                    const mcqs = JSON.parse(jsonString);
+                    mcqs.forEach((mcq, index) => {
+                        const questionDiv = document.createElement('div');
+                        questionDiv.classList.add('mcq-question');
+                        questionDiv.innerHTML = `<p>${index + 1}. ${mcq.question}</p>`;
+                        const optionsList = document.createElement('ul');
+                        optionsList.classList.add('mcq-options');
+                        
+                        mcq.options.forEach(option => {
+                            const optionItem = document.createElement('li');
+                            optionItem.textContent = option;
+                            optionItem.addEventListener('click', () => {
+                                checkAnswer(optionItem, option, mcq.answer, optionsList);
+                            });
+                            optionsList.appendChild(optionItem);
+                        });
+
+                        questionDiv.appendChild(optionsList);
+                        mcqContainer.appendChild(questionDiv);
+                    });
+                } catch (parseError) {
+                    console.error('Failed to parse JSON:', parseError);
+                    mcqContainer.innerHTML = `<p style="color:red; text-align:center;">Failed to generate MCQs. The AI provided an invalid format. Please try again.</p>`;
+                }
+            }
+
+            function checkAnswer(selectedOption, selectedText, correctAnswer, optionsList) {
+                optionsList.querySelectorAll('li').forEach(li => {
+                    li.style.pointerEvents = 'none'; // Disable further clicks
+                    if (li.textContent === correctAnswer) {
+                        li.classList.add('correct');
+                    }
+                });
+
+                if (selectedText === correctAnswer) {
+                    selectedOption.classList.add('correct');
+                } else {
+                    selectedOption.classList.add('incorrect');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
+
+
+        <div class="ad-container">
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-format="fluid"
+                 data-ad-layout-key="-fb+5w+4e-db+86"
+                 data-ad-client="ca-pub-4518941542970502"
+                 data-ad-slot="5357825691"></ins>
+            <script>
+                 (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // DOM elements for page transitions
+            const mainContentSection = document.getElementById('main-content-section');
+            const mcqSection = document.getElementById('mcq-section');
+            const mcqContainer = document.getElementById('mcq-container');
+            const mcqLoader = document.getElementById('mcq-loader');
+            const backBtn = document.getElementById('back-btn');
+            const mcqTopicTitle = document.getElementById('mcq-topic-title');
+            const chapterSearch = document.getElementById('chapter-search');
+
+            // --- Theme Toggle Logic ---
+            const themeToggleBtn = document.getElementById('theme-toggle');
+            const body = document.body;
+            
+            // Check for saved theme in localStorage
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                body.classList.add('dark-mode');
+                themeToggleBtn.textContent = '🌙';
+            } else {
+                body.classList.remove('dark-mode');
+                themeToggleBtn.textContent = '☀️';
+            }
+
+            themeToggleBtn.addEventListener('click', () => {
+                body.classList.toggle('dark-mode');
+                if (body.classList.contains('dark-mode')) {
+                    themeToggleBtn.textContent = '🌙';
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    themeToggleBtn.textContent = '☀️';
+                    localStorage.setItem('theme', 'light');
+                }
+            });
+
+            function showMainContent() {
+                mainContentSection.style.display = 'grid';
+                mcqSection.style.display = 'none';
+                mcqContainer.innerHTML = '';
+            }
+
+            backBtn.addEventListener('click', showMainContent);
+
+            // --- Chapter Search Logic ---
+            chapterSearch.addEventListener('keyup', () => {
+                const query = chapterSearch.value.toLowerCase();
+                const cards = document.querySelectorAll('.subject-card');
+                
+                cards.forEach(card => {
+                    const chapterName = card.querySelector('h3').textContent.toLowerCase();
+                    if (chapterName.includes(query)) {
+                        card.style.display = 'flex';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+
+            // Logic for "Generate MCQ" button clicks
+            document.querySelectorAll('.generate-mcq-btn').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    const chapterName = event.target.closest('.subject-card').getAttribute('data-chapter');
+                    generateAndDisplayMCQs(chapterName);
+                });
+            });
+
+            // --- AI Tutor script ---
+            const apiKey = 'AIzaSyCPx64eOZUtsiZ-DkRYwXGssF1qsOdj4FA';
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+            const chatContainer = document.getElementById('chat-container');
+            const userInput = document.getElementById('user-input');
+            const sendBtn = document.getElementById('send-btn');
+
+            function displayMessage(content, sender) {
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('message');
+                messageDiv.classList.add(sender === 'user' ? 'user-message' : 'ai-tutor-message');
+                
+                messageDiv.innerHTML = content;
+                
+                chatContainer.appendChild(messageDiv);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+
+            function showLoading(container) {
+                const loadingDiv = document.createElement('div');
+                loadingDiv.classList.add('loader');
+                loadingDiv.id = 'loader';
+                container.appendChild(loadingDiv);
+                container.scrollTop = container.scrollHeight;
+            }
+
+            function hideLoading() {
+                const loader = document.getElementById('loader');
+                if (loader) {
+                    loader.remove();
+                }
+            }
+
+            async function generateContent(prompt, config = {}) {
+                try {
+                    const payload = {
+                        "contents": [{
+                            "role": "user",
+                            "parts": [{ "text": prompt }]
+                        }],
+                        ...config
+                    };
+                    
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`API response error: ${response.status} ${response.statusText}`);
+                    }
+
+                    const result = await response.json();
+                    return result;
+                } catch (error) {
+                    console.error('Error fetching from Gemini API:', error);
+                    return { error: 'Sorry, an error occurred. Please try again.' };
+                }
+            }
+
+            async function handleUserInput() {
+                const userMessage = userInput.value.trim();
+                if (userMessage === '') return;
+                
+                displayMessage(userMessage, 'user');
+                userInput.value = '';
+                showLoading(chatContainer);
+
+                const generalPrompt = `The user asked: "${userMessage}". Act as a knowledgeable tutor and provide a concise, helpful answer that teaches the concept. Explain it in a way a student can understand, perhaps with an example if applicable. Keep the response under min 10 words or max 99 words.`;
+                const geminiResponse = await generateContent(generalPrompt);
+                
+                hideLoading();
+
+                const text = geminiResponse?.candidates?.[0]?.content?.parts?.[0]?.text || 'Sorry, I could not generate a response. Please try again.';
+                // Replace markdown bold with HTML bold
+                const formattedText = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+                
+                displayMessage(formattedText, 'ai');
+            }
+
+            sendBtn.addEventListener('click', handleUserInput);
+            userInput.addEventListener('keydown', function(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    handleUserInput();
+                }
+            });
+
+            // --- MCQ Generation Logic ---
+            async function generateAndDisplayMCQs(topic) {
+                mainContentSection.style.display = 'none';
+                mcqSection.style.display = 'block';
+                mcqTopicTitle.textContent = `MCQs on: ${topic}`;
+                mcqContainer.innerHTML = '';
+                mcqLoader.style.display = 'block';
+
+                const mcqPrompt = `Generate 19 multiple-choice questions about the topic "${topic}". The response must be a valid JSON array of objects. Each object should have three properties: "question" (string), "options" (an array of 4 strings), and "answer" (string). The "answer" must match one of the options exactly.`;
+                
+                const responseSchema = {
+                    type: "ARRAY",
+                    items: {
+                        type: "OBJECT",
+                        properties: {
+                            "question": { "type": "STRING" },
+                            "options": {
+                                "type": "ARRAY",
+                                "items": { "type": "STRING" },
+                                "minItems": 4,
+                                "maxItems": 4
+                            },
+                            "answer": { "type": "STRING" }
+                        },
+                        "required": ["question", "options", "answer"]
+                    }
+                };
+
+                const generationConfig = {
+                    generationConfig: {
+                        responseMimeType: "application/json",
+                        responseSchema: responseSchema
+                    }
+                };
+
+                const result = await generateContent(mcqPrompt, generationConfig);
+
+                mcqLoader.style.display = 'none';
+
+                if (result.error) {
+                    mcqContainer.innerHTML = `<p style="color:red; text-align:center;">${result.error}</p>`;
+                    return;
+                }
+
+                try {
+                    const jsonString = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (!jsonString) {
+                         mcqContainer.innerHTML = `<p style="color:red; text-align:center;">Could not generate questions. Please try a different topic.</p>`;
+                         return;
+                    }
+                    const mcqs = JSON.parse(jsonString);
+                    mcqs.forEach((mcq, index) => {
+                        const questionDiv = document.createElement('div');
+                        questionDiv.classList.add('mcq-question');
+                        questionDiv.innerHTML = `<p>${index + 1}. ${mcq.question}</p>`;
+                        const optionsList = document.createElement('ul');
+                        optionsList.classList.add('mcq-options');
+                        
+                        mcq.options.forEach(option => {
+                            const optionItem = document.createElement('li');
+                            optionItem.textContent = option;
+                            optionItem.addEventListener('click', () => {
+                                checkAnswer(optionItem, option, mcq.answer, optionsList);
+                            });
+                            optionsList.appendChild(optionItem);
+                        });
+
+                        questionDiv.appendChild(optionsList);
+                        mcqContainer.appendChild(questionDiv);
+                    });
+                } catch (parseError) {
+                    console.error('Failed to parse JSON:', parseError);
+                    mcqContainer.innerHTML = `<p style="color:red; text-align:center;">Failed to generate MCQs. The AI provided an invalid format. Please try again.</p>`;
+                }
+            }
+
+            function checkAnswer(selectedOption, selectedText, correctAnswer, optionsList) {
+                optionsList.querySelectorAll('li').forEach(li => {
+                    li.style.pointerEvents = 'none'; // Disable further clicks
+                    if (li.textContent === correctAnswer) {
+                        li.classList.add('correct');
+                    }
+                });
+
+                if (selectedText === correctAnswer) {
+                    selectedOption.classList.add('correct');
+                } else {
+                    selectedOption.classList.add('incorrect');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
